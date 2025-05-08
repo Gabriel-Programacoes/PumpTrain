@@ -23,17 +23,19 @@ import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j // Anotação para injetar o logger
+@Slf4j
 @Service
 public class WorkoutSessionService {
 
     private final WorkoutSessionRepository workoutSessionRepository;
-    private final ActivityLogRepository activityLogRepository; // Necessário se não usar cascata ou para buscas
+    private final ActivityLogRepository activityLogRepository;
     private final UserRepository userRepository;
-    private final ExerciseRepository exerciseRepository; // Necessário para buscar exercícios
-    private final ActivityLogMapper activityLogMapper; // Necessário para mapear atividades
+    private final ExerciseRepository exerciseRepository;
+    private final ActivityLogMapper activityLogMapper;
     private final WorkoutSessionMapper workoutSessionMapper;
 
     @Autowired
@@ -41,22 +43,22 @@ public class WorkoutSessionService {
                                  ActivityLogRepository activityLogRepository,
                                  UserRepository userRepository,
                                  ExerciseRepository exerciseRepository,
-                                 ActivityLogMapper activityLogMapper, // Injetar mapper de atividade
+                                 ActivityLogMapper activityLogMapper,
                                  WorkoutSessionMapper workoutSessionMapper) {
         this.workoutSessionRepository = workoutSessionRepository;
         this.activityLogRepository = activityLogRepository;
         this.userRepository = userRepository;
-        this.exerciseRepository = exerciseRepository; // Atribuir
-        this.activityLogMapper = activityLogMapper; // Atribuir
+        this.exerciseRepository = exerciseRepository;
+        this.activityLogMapper = activityLogMapper;
         this.workoutSessionMapper = workoutSessionMapper;
     }
 
     // --- Operações de Sessão ---
 
-    @Transactional // A transação garante atomicidade
+    @Transactional
     public WorkoutSessionDto createWorkoutSession(WorkoutSessionCreateDto createDto, String userEmail) {
         log.info("Tentando criar nova sessão de treino para usuário: {}", userEmail);
-        log.debug("Service Create - DTO Recebido: {}", createDto); // Log incluirá activities agora
+        log.debug("Service Create - DTO Recebido: {}", createDto);
 
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> {
@@ -81,13 +83,13 @@ public class WorkoutSessionService {
         WorkoutSession savedSession = workoutSessionRepository.save(newSession);
         log.info("Sessão de treino principal salva com ID {} para usuário {}", savedSession.getId(), userEmail);
 
-// 2. Processa e associa as atividades (se houver)
+// 2. Processa e associa as atividades
         if (createDto.getActivities() != null && !createDto.getActivities().isEmpty()) {
             log.debug("Processando {} atividades recebidas no DTO para a sessão ID {}", createDto.getActivities().size(), savedSession.getId());
 
             for (ActivityLogDto activityDto : createDto.getActivities()) {
 
-                // Busca o exercício correspondente (agora sabemos que activityDto.getExerciseId() não é null)
+                // Busca o exercício correspondente
                 Exercise exercise = exerciseRepository.findById(activityDto.getExerciseId())
                         .orElseThrow(() -> {
                             // Este erro ainda é possível se o ID existir no DTO mas não no banco
@@ -99,12 +101,11 @@ public class WorkoutSessionService {
                 // Mapeia DTO da atividade para Entidade
                 ActivityLog activityEntity = activityLogMapper.toEntity(activityDto);
 
-                // ASSOCIA a atividade à sessão e ao exercício
-                activityEntity.setWorkoutSession(savedSession); // Associa à sessão recém-salva
-                activityEntity.setExercise(exercise);           // Associa ao exercício buscado
+                activityEntity.setWorkoutSession(savedSession);
+                activityEntity.setExercise(exercise);
 
                 log.debug("Valores da Entidade ActivityLog ANTES da persistência via cascata: ID={}, Reps='{}', Peso='{}'",
-                        activityEntity.getId(), // Será null aqui
+                        activityEntity.getId(),
                         activityEntity.getRepetitions(),
                         activityEntity.getWeightKg());
 
@@ -122,9 +123,8 @@ public class WorkoutSessionService {
         // 3. Retorna o DTO da sessão completa
         // O mapper converterá a Entidade 'savedSession', que agora contém as atividades
         // associadas (que serão/foram salvas pela cascata), para o DTO de resposta.
-        return workoutSessionMapper.toDto(savedSession); // Retorna o DTO da sessão com as atividades
+        return workoutSessionMapper.toDto(savedSession);
     }
-
 
     @Transactional(readOnly = true)
     public List<WorkoutSessionDto> getWorkoutSessionsForUser(String userEmail) {
@@ -172,7 +172,7 @@ public class WorkoutSessionService {
         }
         log.debug("Verificação de permissão OK para sessão ID {} e usuário {}", sessionId, userEmail);
 
-        // --- INÍCIO DOS LOGS DE DEPURAÇÃO ---
+        // --- LOGS DE DEPURAÇÃO ---
 
         log.debug("---- Verificando valores da entidade ANTES do mapeamento para DTO ----");
         // Acessar session.getActivities() pode disparar o carregamento LAZY se ainda não ocorreu
@@ -181,8 +181,8 @@ public class WorkoutSessionService {
                 // Log dos valores diretamente da entidade recuperada do banco
                 log.debug("  [ANTES] Activity ID {}: Reps='{}', Peso='{}'",
                         activityEntity.getId(),
-                        activityEntity.getRepetitions(), // Valor direto da entidade
-                        activityEntity.getWeightKg());   // Valor direto da entidade
+                        activityEntity.getRepetitions(),
+                        activityEntity.getWeightKg());
             }
         } else {
             log.debug("  [ANTES] Nenhuma atividade encontrada na entidade Session.");
@@ -190,7 +190,7 @@ public class WorkoutSessionService {
         log.debug("--------------------------------------------------------------------");
 
 
-        // Chama o mapper para converter a entidade (com suas atividades) para DTO
+        // Chama o mapper para converter a entidade para DTO
         WorkoutSessionDto dto = workoutSessionMapper.toDto(session);
 
 
@@ -200,8 +200,8 @@ public class WorkoutSessionService {
                 // Log dos valores do DTO após o mapeamento ter sido feito
                 log.debug("  [APOS] Activity DTO ID {}: Reps='{}', Peso='{}'",
                         activityDto.getId(),
-                        activityDto.getRepetitions(), // Valor do DTO mapeado
-                        activityDto.getWeightKg());   // Valor do DTO mapeado
+                        activityDto.getRepetitions(),
+                        activityDto.getWeightKg());
             }
         } else {
             log.debug("  [APOS] Nenhuma atividade encontrada no DTO.");
@@ -317,8 +317,7 @@ public class WorkoutSessionService {
         log.info("Sessão de treino ID {} excluída com sucesso por usuário {}", sessionId, userEmail);
     }
 
-    // --- Operações de Atividade (Métodos existentes para adicionar/atualizar/deletar individualmente) ---
-    // Estes métodos continuam úteis para modificar atividades após a criação da sessão.
+    // --- Operações de Atividade ---
 
     @Transactional
     public ActivityLogDto addActivityToSession(Long sessionId, ActivityLogDto activityDto, String userEmail) {
@@ -356,10 +355,7 @@ public class WorkoutSessionService {
         newActivity.setWorkoutSession(session);
         newActivity.setExercise(exercise);
 
-        // Adiciona à coleção e confia na cascata (ou salva explicitamente se preferir)
-        // session.getActivities().add(newActivity);
-        // Alternativa: Salvar explicitamente a atividade
-        ActivityLog savedActivity = activityLogRepository.save(newActivity); // Salva explicitamente
+        ActivityLog savedActivity = activityLogRepository.save(newActivity);
 
         log.info("Atividade salva com ID {} para sessão ID {}", savedActivity.getId(), sessionId);
 
@@ -382,7 +378,7 @@ public class WorkoutSessionService {
                 // Pode ser necessário um fetch join na query ou carregar explicitamente
                 .map(activity -> {
                     // Força o carregamento da sessão se for LAZY
-                    activity.getWorkoutSession().getId(); // Acessa a sessão para carregá-la
+                    activity.getWorkoutSession().getId();
                     return activity;
                 })
                 .orElseThrow(() -> {
@@ -391,7 +387,7 @@ public class WorkoutSessionService {
                 });
         log.debug("Atividade ID {} encontrada para atualização.", activityId);
 
-        // Verificação de permissão (através da sessão associada)
+        // Verificação de permissão
         if (!activityLog.getWorkoutSession().getUser().getId().equals(user.getId())) {
             log.warn("Acesso negado: Usuário {} tentou atualizar atividade ID {} que pertence a outro usuário (ID: {}).",
                     userEmail, activityId, activityLog.getWorkoutSession().getUser().getId());
@@ -416,7 +412,7 @@ public class WorkoutSessionService {
         }
 
 
-        ActivityLog updatedActivity = activityLogRepository.save(activityLog); // Salva as alterações
+        ActivityLog updatedActivity = activityLogRepository.save(activityLog);
         log.info("Atividade ID {} atualizada com sucesso por usuário {}", activityId, userEmail);
 
         return activityLogMapper.toDto(updatedActivity);
@@ -435,7 +431,7 @@ public class WorkoutSessionService {
         ActivityLog activityLog = activityLogRepository.findById(activityId)
                 // Garante que a sessão seja carregada para verificar permissão
                 .map(activity -> {
-                    activity.getWorkoutSession().getId(); // Acessa a sessão para carregá-la
+                    activity.getWorkoutSession().getId();
                     return activity;
                 })
                 .orElseThrow(() -> {
@@ -444,7 +440,7 @@ public class WorkoutSessionService {
                 });
         log.debug("Atividade ID {} encontrada para exclusão.", activityId);
 
-        // Verificação de permissão (através da sessão associada)
+        // Verificação de permissão
         if (!activityLog.getWorkoutSession().getUser().getId().equals(user.getId())) {
             log.warn("Acesso negado: Usuário {} tentou excluir atividade ID {} que pertence a outro usuário (ID: {}).",
                     userEmail, activityId, activityLog.getWorkoutSession().getUser().getId());
@@ -489,6 +485,31 @@ public class WorkoutSessionService {
         log.info("Treino ID {} marcado como concluído com sucesso.", sessionId);
 
         return workoutSessionMapper.toDto(savedSession);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<WorkoutSessionDto> getWorkoutOfTheDay(String userEmail) {
+        log.info("Buscando 'Treino do Dia' para usuário {}", userEmail);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado: " + userEmail));
+
+        LocalDate today = LocalDate.now();
+        log.debug("Buscando treinos para usuário ID {} na data {}", user.getId(), today);
+
+        // Busca treinos para hoje que não estão completos
+        List<WorkoutSession> workoutsForToday = workoutSessionRepository
+                .findByUserAndSessionDateAndCompletedAtIsNullOrderByIdDesc(user, today);
+
+        if (workoutsForToday.isEmpty()) {
+            log.info("Nenhum treino não concluído encontrado para hoje para o usuário {}", userEmail);
+            return Optional.empty(); // Retorna vazio se não houver treino para hoje
+        } else {
+            // Pega o primeiro da lista (que é o mais recente criado para hoje, devido ao OrderByIdDesc)
+            WorkoutSession workoutOfTheDay = workoutsForToday.get(0);
+            log.info("Treino do Dia encontrado (ID: {}) para usuário {}", workoutOfTheDay.getId(), userEmail);
+            // Mapeia para DTO e retorna
+            return Optional.of(workoutSessionMapper.toDto(workoutOfTheDay));
+        }
     }
 
 }

@@ -15,6 +15,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 // ---------------------------------------------
 
@@ -183,5 +185,22 @@ public class WorkoutSessionController {
         log.info("Sessão ID {} marcada como concluída.", workoutId);
         // Retorna 200 OK com a sessão atualizada (incluindo completedAt)
         return ResponseEntity.ok(completedSession);
+    }
+
+    @GetMapping("/today") // Rota: GET /api/workouts/today
+    public ResponseEntity<WorkoutSessionDto> getWorkoutOfTheDay(Principal principal) {
+        if (principal == null || principal.getName() == null) {
+            log.warn("Tentativa não autenticada de buscar treino do dia.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String userEmail = principal.getName();
+        log.info("Requisição GET recebida para /today do usuário: {}", userEmail);
+
+        Optional<WorkoutSessionDto> workoutDtoOpt = workoutSessionService.getWorkoutOfTheDay(userEmail);
+
+        // Se encontrou, retorna 200 OK com o DTO. Se não, retorna 204 No Content.
+        return workoutDtoOpt
+                .map(ResponseEntity::ok) // Se presente, retorna 200 OK com o DTO
+                .orElseGet(() -> ResponseEntity.noContent().build()); // Se ausente, retorna 204
     }
 }
