@@ -1,0 +1,300 @@
+2025-04-28T07:51:13.755-03:00  INFO 1356 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Starting PumptrainApplication using Java 23.0.1 with PID 1356 (C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend\target\classes started by Ti-03 in C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend)
+2025-04-28T07:51:13.760-03:00  INFO 1356 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-04-28T07:51:15.793-03:00  INFO 1356 --- [pumptrain] [main] c.p.pumptrain.service.JwtService         : JwtService inicializado.
+2025-04-28T07:51:17.905-03:00  INFO 1356 --- [pumptrain] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-04-28T07:51:17.905-03:00  WARN 1356 --- [pumptrain] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-04-28T07:51:18.043-03:00  WARN 1356 --- [pumptrain] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-28T07:51:18.937-03:00  INFO 1356 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Started PumptrainApplication in 5.708 seconds (process running for 6.516)
+2025-04-28T07:51:19.212-03:00  INFO 1356 --- [pumptrain] [main] c.p.pumptrain.config.DataInitializer     : >>> Banco de dados de exercícios já populado. Nenhum dado novo inserido pelo Initializer.
+2025-04-28T07:56:18.774-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-28T07:56:18.776-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-04-28T07:56:18.992-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.c.WorkoutSessionController         : Requisição recebida para listar sessões de treino do usuário: front@gmail.com
+2025-04-28T07:56:18.993-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.service.WorkoutSessionService      : Buscando sessões de treino para usuário: front@gmail.com
+2025-04-28T07:56:19.643-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.controller.ExerciseController      : Requisição recebida para listar todos os exercícios.
+2025-04-28T07:56:19.643-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-5] c.p.pumptrain.service.ExerciseService    : Buscando todos os exercícios.
+2025-04-28T07:56:19.654-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-7] c.p.p.controller.ExerciseController      : Requisição recebida para listar todos os exercícios.
+2025-04-28T07:56:19.655-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-7] c.p.pumptrain.service.ExerciseService    : Buscando todos os exercícios.
+2025-04-28T07:56:26.614-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-6] c.p.p.controller.ExerciseController      : Requisição recebida para listar todos os exercícios.
+2025-04-28T07:56:26.614-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-6] c.p.pumptrain.service.ExerciseService    : Buscando todos os exercícios.
+2025-04-28T07:56:41.343-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.c.WorkoutSessionController         : Requisição recebida para criar sessão de treino para usuário: front@gmail.com
+2025-04-28T07:56:41.344-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.c.WorkoutSessionController         : Controller: DTO recebido para criar sessão: WorkoutSessionCreateDto(sessionDate=2025-04-28, notes=sgsg, name=defsfse, activities=[ActivityLogDto(id=null, exerciseId=1, exerciseName=null, sets=7, repetitions=null, weightKg=null, durationMinutes=null, distanceKm=null, notes=null, activityTimestamp=null)])
+2025-04-28T07:56:41.345-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.service.WorkoutSessionService      : Tentando criar nova sessão de treino para usuário: front@gmail.com
+2025-04-28T07:56:41.381-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.service.WorkoutSessionService      : Sessão de treino principal salva com ID 86 para usuário front@gmail.com
+2025-04-28T07:56:41.387-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.service.WorkoutSessionService      : 1 atividades processadas e associadas à sessão ID 86
+2025-04-28T07:56:41.399-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.c.WorkoutSessionController         : Sessão de treino criada com ID: 86 para usuário: front@gmail.com
+2025-04-28T07:56:41.445-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-10] c.p.p.c.WorkoutSessionController         : Requisição recebida para listar sessões de treino do usuário: front@gmail.com
+2025-04-28T07:56:41.445-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-10] c.p.p.service.WorkoutSessionService      : Buscando sessões de treino para usuário: front@gmail.com
+2025-04-28T07:56:42.476-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 86 para usuário: front@gmail.com
+2025-04-28T07:56:42.476-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 86 para usuário front@gmail.com
+2025-04-28T07:57:25.523-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 86 para usuário: front@gmail.com
+2025-04-28T07:57:25.523-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 86 para usuário front@gmail.com
+2025-04-28T07:57:31.406-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 86 para usuário: front@gmail.com
+2025-04-28T07:57:31.406-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 86 para usuário front@gmail.com
+2025-04-28T08:05:43.136-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 83 para usuário: front@gmail.com
+2025-04-28T08:05:43.136-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 83 para usuário front@gmail.com
+2025-04-28T08:05:43.139-03:00  WARN 1356 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.service.WorkoutSessionService      : Falha ao buscar detalhes: Sessão de treino ID 83 não encontrada.
+2025-04-28T08:05:43.143-03:00  WARN 1356 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.c.advice.GlobalExceptionHandler    : Recurso não encontrado: Sessão de treino não encontrada com ID: 83
+2025-04-28T08:06:25.978-03:00 ERROR 1356 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.c.advice.GlobalExceptionHandler    : Erro inesperado na requisição /auth/login: 
+
+org.springframework.http.converter.HttpMessageNotReadableException: Required request body is missing: public org.springframework.http.ResponseEntity<?> com.pumptrain.pumptrain.controller.AuthController.login(com.pumptrain.pumptrain.dto.LoginRequestDto)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor.readWithMessageConverters(RequestResponseBodyMethodProcessor.java:179) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor.resolveArgument(RequestResponseBodyMethodProcessor.java:150) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.method.support.HandlerMethodArgumentResolverComposite.resolveArgument(HandlerMethodArgumentResolverComposite.java:122) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.method.support.InvocableHandlerMethod.getMethodArgumentValues(InvocableHandlerMethod.java:227) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:181) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590) ~[tomcat-embed-core-10.1.40.jar:6.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.40.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at com.pumptrain.pumptrain.config.filter.JwtAuthFilter.doFilterInternal(JwtAuthFilter.java:50) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319) ~[spring-security-config-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243) ~[spring-webmvc-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240) ~[spring-security-config-6.5.0-RC1.jar:6.5.0-RC1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.6.jar:6.2.6]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:116) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:398) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1740) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1189) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:658) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.40.jar:10.1.40]
+	at java.base/java.lang.Thread.run(Thread.java:1575) ~[na:na]
+
+2025-04-28T08:07:38.196-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-1] c.p.pumptrain.controller.AuthController  : Requisição recebida para login do usuário: front@gmail.com
+2025-04-28T08:07:38.329-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-1] c.p.pumptrain.service.JwtService         : Token JWT gerado com sucesso para usuário: front@gmail.com
+2025-04-28T08:07:38.329-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-1] c.p.pumptrain.controller.AuthController  : Login bem-sucedido para: front@gmail.com
+2025-04-28T08:08:40.040-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.c.WorkoutSessionController         : Requisição recebida para criar sessão de treino para usuário: front@gmail.com
+2025-04-28T08:08:40.040-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.c.WorkoutSessionController         : Controller: DTO recebido para criar sessão: WorkoutSessionCreateDto(sessionDate=2025-04-26, notes=Teste via Postman com atividades., name=Meu Treino de Teste Postman, activities=[ActivityLogDto(id=null, exerciseId=1, exerciseName=null, sets=3, repetitions=10,8,6, weightKg=60,70,80, durationMinutes=null, distanceKm=null, notes=Atividade 1 - Supino, activityTimestamp=null), ActivityLogDto(id=null, exerciseId=5, exerciseName=null, sets=4, repetitions=12,12,10,10, weightKg=20,20,25,25, durationMinutes=null, distanceKm=null, notes=Atividade 2 - Bíceps, activityTimestamp=null), ActivityLogDto(id=null, exerciseId=4, exerciseName=null, sets=1, repetitions=null, weightKg=null, durationMinutes=20, distanceKm=3.5, notes=Atividade 3 - Cardio, activityTimestamp=null)])
+2025-04-28T08:08:40.041-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.service.WorkoutSessionService      : Tentando criar nova sessão de treino para usuário: front@gmail.com
+2025-04-28T08:08:40.043-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.service.WorkoutSessionService      : Sessão de treino principal salva com ID 87 para usuário front@gmail.com
+2025-04-28T08:08:40.045-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.service.WorkoutSessionService      : 3 atividades processadas e associadas à sessão ID 87
+2025-04-28T08:08:40.048-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.c.WorkoutSessionController         : Sessão de treino criada com ID: 87 para usuário: front@gmail.com
+2025-04-28T08:09:03.883-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 87 para usuário: front@gmail.com
+2025-04-28T08:09:03.884-03:00  INFO 1356 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 87 para usuário front@gmail.com
+2025-04-28T08:20:39.659-03:00  INFO 9460 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Starting PumptrainApplication using Java 23.0.1 with PID 9460 (C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend\target\classes started by Ti-03 in C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend)
+2025-04-28T08:20:39.661-03:00  INFO 9460 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-04-28T08:20:41.129-03:00  INFO 9460 --- [pumptrain] [main] c.p.pumptrain.service.JwtService         : JwtService inicializado.
+2025-04-28T08:20:42.949-03:00  INFO 9460 --- [pumptrain] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-04-28T08:20:42.950-03:00  WARN 9460 --- [pumptrain] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-04-28T08:20:43.059-03:00  WARN 9460 --- [pumptrain] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-28T08:20:43.725-03:00  INFO 9460 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Started PumptrainApplication in 4.415 seconds (process running for 4.683)
+2025-04-28T08:20:44.033-03:00  INFO 9460 --- [pumptrain] [main] c.p.pumptrain.config.DataInitializer     : >>> Banco de dados de exercícios já populado. Nenhum dado novo inserido pelo Initializer.
+2025-04-28T08:20:55.108-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-28T08:20:55.114-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2025-04-28T08:20:55.441-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 86 para usuário: front@gmail.com
+2025-04-28T08:20:55.443-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 86 para usuário front@gmail.com
+2025-04-28T08:20:56.437-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 86 para usuário: front@gmail.com
+2025-04-28T08:20:56.438-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 86 para usuário front@gmail.com
+2025-04-28T08:20:58.768-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.c.WorkoutSessionController         : Requisição recebida para excluir sessão ID: 86 para usuário: front@gmail.com
+2025-04-28T08:20:58.769-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.service.WorkoutSessionService      : Tentando excluir sessão ID 86 para usuário front@gmail.com
+2025-04-28T08:20:58.782-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.service.WorkoutSessionService      : Sessão de treino ID 86 excluída com sucesso por usuário front@gmail.com
+2025-04-28T08:20:58.801-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.c.WorkoutSessionController         : Sessão ID: 86 excluída com sucesso para usuário: front@gmail.com
+2025-04-28T08:20:58.828-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-4] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 86 para usuário: front@gmail.com
+2025-04-28T08:20:58.828-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-4] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 86 para usuário front@gmail.com
+2025-04-28T08:20:58.832-03:00  WARN 9460 --- [pumptrain] [http-nio-9970-exec-4] c.p.p.service.WorkoutSessionService      : Falha ao buscar detalhes: Sessão de treino ID 86 não encontrada.
+2025-04-28T08:20:58.838-03:00  WARN 9460 --- [pumptrain] [http-nio-9970-exec-4] c.p.p.c.advice.GlobalExceptionHandler    : Recurso não encontrado: Sessão de treino não encontrada com ID: 86
+2025-04-28T08:20:58.848-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.c.WorkoutSessionController         : Requisição recebida para listar sessões de treino do usuário: front@gmail.com
+2025-04-28T08:20:58.848-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.service.WorkoutSessionService      : Buscando sessões de treino para usuário: front@gmail.com
+2025-04-28T08:21:00.011-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-7] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 87 para usuário: front@gmail.com
+2025-04-28T08:21:00.011-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-7] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 87 para usuário front@gmail.com
+2025-04-28T08:21:34.358-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.c.WorkoutSessionController         : Requisição recebida para excluir sessão ID: 87 para usuário: front@gmail.com
+2025-04-28T08:21:34.358-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.service.WorkoutSessionService      : Tentando excluir sessão ID 87 para usuário front@gmail.com
+2025-04-28T08:21:34.362-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.service.WorkoutSessionService      : Sessão de treino ID 87 excluída com sucesso por usuário front@gmail.com
+2025-04-28T08:21:34.365-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.c.WorkoutSessionController         : Sessão ID: 87 excluída com sucesso para usuário: front@gmail.com
+2025-04-28T08:21:34.395-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 87 para usuário: front@gmail.com
+2025-04-28T08:21:34.397-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 87 para usuário front@gmail.com
+2025-04-28T08:21:34.401-03:00  WARN 9460 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.service.WorkoutSessionService      : Falha ao buscar detalhes: Sessão de treino ID 87 não encontrada.
+2025-04-28T08:21:34.403-03:00  WARN 9460 --- [pumptrain] [http-nio-9970-exec-9] c.p.p.c.advice.GlobalExceptionHandler    : Recurso não encontrado: Sessão de treino não encontrada com ID: 87
+2025-04-28T08:21:34.422-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-10] c.p.p.c.WorkoutSessionController         : Requisição recebida para listar sessões de treino do usuário: front@gmail.com
+2025-04-28T08:21:34.423-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-10] c.p.p.service.WorkoutSessionService      : Buscando sessões de treino para usuário: front@gmail.com
+2025-04-28T08:21:37.630-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] c.p.p.controller.ExerciseController      : Requisição recebida para listar todos os exercícios.
+2025-04-28T08:21:37.631-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] c.p.pumptrain.service.ExerciseService    : Buscando todos os exercícios.
+2025-04-28T08:21:53.522-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.c.WorkoutSessionController         : Requisição recebida para criar sessão de treino para usuário: front@gmail.com
+2025-04-28T08:21:53.522-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.c.WorkoutSessionController         : Controller: DTO recebido para criar sessão: WorkoutSessionCreateDto(sessionDate=2025-04-28, notes=asdxasca, name=fsvgsafs, activities=[ActivityLogDto(id=null, exerciseId=5, exerciseName=null, sets=12, repetitions=null, weightKg=null, durationMinutes=null, distanceKm=null, notes=null, activityTimestamp=null)])
+2025-04-28T08:21:53.524-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.service.WorkoutSessionService      : Tentando criar nova sessão de treino para usuário: front@gmail.com
+2025-04-28T08:21:53.539-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.service.WorkoutSessionService      : Sessão de treino principal salva com ID 88 para usuário front@gmail.com
+2025-04-28T08:21:53.541-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.service.WorkoutSessionService      : 1 atividades processadas e associadas à sessão ID 88
+2025-04-28T08:21:53.545-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-2] c.p.p.c.WorkoutSessionController         : Sessão de treino criada com ID: 88 para usuário: front@gmail.com
+2025-04-28T08:21:53.592-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.c.WorkoutSessionController         : Requisição recebida para listar sessões de treino do usuário: front@gmail.com
+2025-04-28T08:21:53.593-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-3] c.p.p.service.WorkoutSessionService      : Buscando sessões de treino para usuário: front@gmail.com
+2025-04-28T08:21:55.560-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:21:55.561-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-5] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:22:56.508-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:22:56.509-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-8] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:24:31.012-03:00  INFO 14412 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Starting PumptrainApplication using Java 23.0.1 with PID 14412 (C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend\target\classes started by Ti-03 in C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend)
+2025-04-28T08:24:31.014-03:00  INFO 14412 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-04-28T08:24:32.527-03:00  INFO 14412 --- [pumptrain] [main] c.p.pumptrain.service.JwtService         : JwtService inicializado.
+2025-04-28T08:24:34.110-03:00  INFO 14412 --- [pumptrain] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-04-28T08:24:34.110-03:00  WARN 14412 --- [pumptrain] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-04-28T08:24:34.200-03:00  WARN 14412 --- [pumptrain] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-28T08:24:34.945-03:00  WARN 14412 --- [pumptrain] [main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2025-04-28T08:24:34.981-03:00 ERROR 14412 --- [pumptrain] [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 9970 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 9970 or configure this application to listen on another port.
+
+2025-04-28T08:26:09.400-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-10] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:26:09.400-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-10] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:26:11.881-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:26:11.882-03:00  INFO 9460 --- [pumptrain] [http-nio-9970-exec-1] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:26:17.714-03:00  INFO 18112 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Starting PumptrainApplication using Java 23.0.1 with PID 18112 (C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend\target\classes started by Ti-03 in C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend)
+2025-04-28T08:26:17.716-03:00  INFO 18112 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-04-28T08:26:19.182-03:00  INFO 18112 --- [pumptrain] [main] c.p.pumptrain.service.JwtService         : JwtService inicializado.
+2025-04-28T08:26:20.712-03:00  INFO 18112 --- [pumptrain] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-04-28T08:26:20.712-03:00  WARN 18112 --- [pumptrain] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-04-28T08:26:20.809-03:00  WARN 18112 --- [pumptrain] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-28T08:26:21.549-03:00  INFO 18112 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Started PumptrainApplication in 4.206 seconds (process running for 4.73)
+2025-04-28T08:26:21.789-03:00  INFO 18112 --- [pumptrain] [main] c.p.pumptrain.config.DataInitializer     : >>> Banco de dados de exercícios já populado. Nenhum dado novo inserido pelo Initializer.
+2025-04-28T08:26:28.598-03:00  INFO 18112 --- [pumptrain] [http-nio-9977-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-28T08:26:28.599-03:00  INFO 18112 --- [pumptrain] [http-nio-9977-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2025-04-28T08:26:28.785-03:00  INFO 18112 --- [pumptrain] [http-nio-9977-exec-3] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:26:28.787-03:00  INFO 18112 --- [pumptrain] [http-nio-9977-exec-3] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:26:31.513-03:00  INFO 18112 --- [pumptrain] [http-nio-9977-exec-2] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:26:31.514-03:00  INFO 18112 --- [pumptrain] [http-nio-9977-exec-2] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:28:41.079-03:00  INFO 17532 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Starting PumptrainApplication using Java 23.0.1 with PID 17532 (C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend\target\classes started by Ti-03 in C:\Users\Ti-03\Desktop\Codigos\WebServices (Pranks)\PumpTrain\pumptrain-backend)
+2025-04-28T08:28:41.081-03:00  INFO 17532 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-04-28T08:28:42.489-03:00  INFO 17532 --- [pumptrain] [main] c.p.pumptrain.service.JwtService         : JwtService inicializado.
+2025-04-28T08:28:44.173-03:00  INFO 17532 --- [pumptrain] [main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-04-28T08:28:44.174-03:00  WARN 17532 --- [pumptrain] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-04-28T08:28:44.277-03:00  WARN 17532 --- [pumptrain] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-28T08:28:45.009-03:00  INFO 17532 --- [pumptrain] [main] c.p.pumptrain.PumptrainApplication       : Started PumptrainApplication in 4.288 seconds (process running for 4.798)
+2025-04-28T08:28:45.252-03:00  INFO 17532 --- [pumptrain] [main] c.p.pumptrain.config.DataInitializer     : >>> Banco de dados de exercícios já populado. Nenhum dado novo inserido pelo Initializer.
+2025-04-28T08:28:48.847-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-28T08:28:48.849-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-04-28T08:28:49.016-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-1] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:28:49.017-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-1] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:28:49.595-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-2] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:28:49.596-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-2] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:28:52.643-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-3] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:28:52.643-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-3] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com
+2025-04-28T08:30:23.234-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-5] c.p.p.c.WorkoutSessionController         : Requisição recebida para buscar detalhes da sessão ID: 88 para usuário: front@gmail.com
+2025-04-28T08:30:23.235-03:00  INFO 17532 --- [pumptrain] [http-nio-9977-exec-5] c.p.p.service.WorkoutSessionService      : Buscando detalhes da sessão ID 88 para usuário front@gmail.com

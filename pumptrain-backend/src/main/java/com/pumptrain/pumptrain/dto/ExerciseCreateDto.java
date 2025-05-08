@@ -1,0 +1,26 @@
+package com.pumptrain.pumptrain.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExerciseCreateDto {
+
+    @NotBlank(message = "O nome do exercício não pode ser vazio.")
+    @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres.")
+    private String name;
+
+    @Size(max = 1000, message = "A descrição não pode exceder 1000 caracteres.")
+    private String description;
+
+    @Size(max = 50, message = "O grupo muscular não pode exceder 50 caracteres.")
+    private String muscleGroup;
+
+    @Size(max = 200, message = "A equipamento não pode exceder 200 caracteres.")
+    private String equipment;
+}
