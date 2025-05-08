@@ -1,107 +1,55 @@
-# PumpTrain - Frontend
+# PUMPTRAIN - Frontend
 
-## Descrição
+![PumpTrain Logo Placeholder](https://via.placeholder.com/150/77cc88/06070e?text=PUMPTRAIN)
+*(Substitua por um logo real, se tiver)*
 
-Este é o repositório do frontend para a aplicação PumpTrain, uma plataforma web moderna para acompanhamento de treinos de fitness. O objetivo é fornecer uma interface de usuário responsiva, intuitiva e funcional onde os usuários possam registrar, visualizar, editar e deletar seus treinos e atividades físicas.
+Frontend da aplicação web PUMPTRAIN, uma plataforma moderna para acompanhamento e gerenciamento de treinos de fitness.
 
-## Tecnologias Utilizadas
+---
 
-O frontend é construído com um conjunto de tecnologias modernas para garantir performance, manutenibilidade e uma ótima experiência de desenvolvimento:
+## 📜 Descrição
 
-* **React:** Biblioteca JavaScript declarativa e baseada em componentes para construir interfaces de usuário interativas.
-* **TypeScript:** Superset do JavaScript que adiciona tipagem estática, aumentando a robustez e a segurança do código.
-* **Vite:** Ferramenta de build e servidor de desenvolvimento frontend extremamente rápida e moderna.
-* **Material UI (MUI):** Biblioteca de componentes React que implementa o Material Design do Google. Usada extensivamente para UI, layout (Grid v2, Box, Stack, Container), inputs, feedback visual e theming.
-    * **Theming:** Um tema customizado (principalmente escuro com detalhes em verde) está definido em `src/theme.ts`.
-* **React Router DOM:** Biblioteca padrão para roteamento em aplicações React single-page, gerenciando a navegação entre as diferentes "páginas" da aplicação.
-* **Axios:** Cliente HTTP baseado em Promises para realizar requisições à API backend. Uma instância configurada (`src/api/apiClient.ts`) inclui interceptors para adicionar tokens de autenticação e tratar erros básicos.
-* **React Query (@tanstack/react-query):** Biblioteca poderosa para gerenciamento de estado do servidor (server state). Simplifica o fetching, caching, sincronização e atualização de dados da API, além de gerenciar o estado de mutações (criação, atualização, deleção).
+PUMPTRAIN é uma Single Page Application (SPA) construída com React e TypeScript, focada em fornecer uma interface de usuário rica, responsiva e performática. Ela permite aos usuários registrar seus treinos, acompanhar o progresso, visualizar estatísticas, gerenciar o perfil e (futuramente) interagir com uma comunidade ou desafios. O design segue um tema escuro customizado utilizando Material UI.
 
-## Funcionalidades Implementadas
+---
 
-* **Autenticação:** (Implícito - Hooks e API Client lidam com tokens). Páginas de Login/Cadastro (a serem criadas).
-* **Dashboard/Listagem de Treinos (`MyWorkoutsPage`):** Exibe a lista de treinos do usuário em formato de Cards, com busca e ações rápidas (Editar/Deletar via menu). Inclui placeholders para estatísticas futuras.
-* **Criação de Treino (`CreateWorkoutPage` / `WorkoutForm`):** Permite ao usuário registrar um novo treino, incluindo data, nome (opcional), notas (opcional) e uma lista dinâmica de atividades (exercício, séries, reps, peso, notas).
-    * Utiliza o componente reutilizável `WorkoutForm` baseado em `react-hook-form` e `zod` para validação.
-* **Detalhes do Treino (`WorkoutDetailPage`):** Exibe todas as informações de um treino específico, incluindo a lista detalhada das atividades realizadas. Permite Editar ou Deletar o treino.
-* **Edição de Treino (`EditWorkoutPage`):** Reutiliza o `WorkoutForm` para permitir a modificação de treinos existentes, pré-preenchendo os dados atuais.
-* **Exclusão de Treino:** Implementada com um dialog de confirmação e usando o hook `useDeleteWorkoutMutation`, com atualização automática da UI via invalidação de cache do React Query.
-* **(Opcional) Landing Page:** Página inicial para apresentar a aplicação a novos usuários.
+## ✨ Funcionalidades Principais
 
-## Estrutura do Projeto (`src/`)
+* **Autenticação de Usuário:** Fluxo de Login e Registro (páginas e lógica de contexto).
+* **Dashboard Principal:** Visão geral com estatísticas chave (Sequência, Contagem de Treinos, Metas, etc. - parcialmente conectado a dados reais) e exibição do "Treino do Dia".
+* **Gerenciamento de Treinos (CRUD):**
+    * Listagem e visualização de treinos passados.
+    * Criação de novos treinos com detalhes de atividades (exercício, séries, reps, peso, notas).
+    * Visualização detalhada de um treino específico.
+    * Edição de treinos existentes.
+    * Exclusão de treinos com confirmação.
+* **Gerenciamento de Perfil:** Visualização e edição de informações do usuário (Nome, Email, Idade, Altura, Peso).
+* **(Planejado/Parcial)** Listagem e Visualização de Exercícios Gerais.
+* **(Planejado/Parcial)** Sistema de Conquistas (Achievements).
+* **Landing Page:** Página de apresentação para novos usuários.
+* **Design Responsivo:** Adaptável a diferentes tamanhos de tela (desktop, mobile).
+* **Tema Escuro:** Interface padronizada com tema escuro e acentos na cor primária.
 
-O código fonte está organizado da seguinte forma:
+---
 
-* `api/`: Contém a configuração do cliente Axios (`apiClient.ts`).
-* `assets/`: Para imagens, fontes e outros arquivos estáticos.
-* `components/`: Componentes React reutilizáveis (ex: `WorkoutForm.tsx`, `WorkoutCard.tsx`).
-* `context/`: Context API do React (ex: `SnackbarProvider`).
-* `hooks/`: Hooks customizados, principalmente para React Query (`useWorkoutsQuery`, `useWorkoutDetailQuery`, `useExercisesQuery`, `useCreateWorkoutMutation`, `useUpdateWorkoutMutation`, `useDeleteWorkoutMutation`).
-* `pages/`: Componentes que representam as páginas completas da aplicação (ex: `MyWorkoutsPage.tsx`, `EditWorkoutPage.tsx`, `WorkoutDetailPage.tsx`).
-* `types/`: Definições de interface TypeScript para os modelos de dados (ex: `Workout.ts`, `Activity.ts`, `Exercise.ts`).
-* `theme.ts`: Definição do tema customizado do Material UI.
-* `main.tsx` / `App.tsx`: Arquivos principais de inicialização, configuração de rotas e providers.
+## 🚀 Tecnologias Utilizadas
 
-## Arquitetura e Conceitos Chave
+* **React (v18+):** Biblioteca JavaScript para construção de interfaces de usuário.
+* **TypeScript:** Superset tipado do JavaScript para maior robustez e manutenibilidade.
+* **Vite:** Build tool e servidor de desenvolvimento frontend de alta performance.
+* **Material UI (MUI) v5/v6:** Biblioteca de componentes UI baseada no Material Design.
+    * **Core:** `@mui/material` para componentes (Box, Container, Grid v2, Card, Button, TextField, etc.).
+    * **Icons:** `@mui/icons-material` para iconografia.
+    * **Styles:** `@mui/material/styles` para `styled` e `ThemeProvider`.
+    * **Date Pickers:** `@mui/x-date-pickers` para seleção de datas.
+* **React Router DOM (v6):** Para roteamento declarativo no lado do cliente (SPA).
+* **TanStack Query (React Query) v4/v5:** Gerenciamento de estado do servidor (fetching, caching, mutações, invalidação).
+* **Axios:** Cliente HTTP para comunicação com a API backend.
+* **React Hook Form:** (Usado em `WorkoutForm`, `ProfilePage`) Para gerenciamento de formulários e validação.
+* **Zod:** (Usado com React Hook Form) Para validação de schemas com inferência de tipo.
+* **Day.js:** Biblioteca leve para manipulação e formatação de datas.
+* **ESLint / Prettier:** Ferramentas para padronização e qualidade de código (configuração não fornecida, mas recomendada).
 
-* **Componentização:** A interface é dividida em componentes reutilizáveis.
-* **Estado do Servidor:** Gerenciado de forma eficiente pelo React Query, separando o estado da API do estado local da UI. Os hooks customizados abstraem a lógica de comunicação e cache.
-* **Tipagem:** O uso de TypeScript garante maior segurança e facilita a manutenção.
-* **Cliente API Centralizado:** O `apiClient.ts` centraliza a configuração do Axios e a lógica de interceptors (autenticação JWT Bearer, tratamento básico de erros).
-* **Roteamento:** Aplicação de página única (SPA) gerenciada pelo React Router DOM.
-* **Estilização:** Primariamente com Material UI e a prop `sx` para customizações pontuais, seguindo o tema definido em `theme.ts`.
+---
 
-## Como Executar Localmente
-
-Para executar este projeto frontend localmente, siga os passos:
-
-1.  **Pré-requisitos:**
-    * Node.js (versão LTS recomendada)
-    * npm ou yarn
-
-2.  **Clone o Repositório:**
-    ```bash
-    git clone https://github.com/Gabriel-Programacoes/PumpTrain.git
-    cd pumptrain-frontend
-    ```
-
-3.  **Instale as Dependências:**
-    ```bash
-    npm install
-    # ou
-    yarn install
-    ```
-
-4.  **Configure as Variáveis de Ambiente:**
-    * Crie um arquivo `.env` na raiz do projeto.
-    * Adicione as variáveis necessárias. No mínimo, a URL base da API:
-        ```dotenv
-        # Exemplo .env
-        VITE_API_BASE_URL=http://localhost:9977/api
-        ```
-    * **Importante:** Modifique o arquivo `src/api/apiClient.ts` para ler esta variável em vez de ter a URL fixa:
-        ```typescript
-        // Em apiClient.ts
-        const apiClient = axios.create({
-            baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:9977/api", // Fallback opcional
-            // ... headers ...
-        });
-        ```
-
-5.  **Execute o Servidor de Desenvolvimento:**
-    ```bash
-    npm run dev
-    # ou
-    yarn dev
-    ```
-    Isso iniciará o servidor Vite, geralmente em `http://localhost:5173` (verifique a saída do terminal).
-
-6.  **Execute o Backend:** Certifique-se de que a aplicação backend PUMPTRAIN esteja em execução e acessível na URL configurada no passo 4 (ex: `http://localhost:9977`).
-
-## Contribuição
-
-*(Opcional: Adicione diretrizes se o projeto for aberto a contribuições)*
-
-## Licença
-
-*(Opcional: Adicione a licença do seu projeto, ex: MIT)*
+## 📁 Estrutura do Projeto (`src/`)
