@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/user/profile").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/user/achievements").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/workouts/today").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/user/achievements/all").authenticated()
 
 
                         .requestMatchers(HttpMethod.PUT, "/api/workouts/**").authenticated()

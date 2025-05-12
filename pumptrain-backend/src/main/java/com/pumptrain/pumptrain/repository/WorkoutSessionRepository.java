@@ -16,7 +16,7 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
 
     /**
      * Encontra todas as sessões de treino para um usuário específico,
-     * ordenadas pela data da sessão em ordem decrescente (mais recentes primeiro).
+     * ordenadas pela data da sessão em ordem decrescente
      *
      * @param user O usuário cujas sessões devem ser buscadas.
      * @return Uma lista de WorkoutSession ordenadas.
@@ -36,9 +36,9 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
      * intervalo de datas de sessão (sessionDate).
      *
      * @param user O usuário.
-     * @param startDate A data de início do intervalo (inclusiva).
-     * @param endDate A data de fim do intervalo (inclusiva).
-     * @return O número de sessões de treino no intervalo.
+     * @param startDate A data de início do intervalo
+     * @param endDate A data de fim do intervalo
+     * @return O número de sessões de treino no intervalo
      */
     int countByUserAndSessionDateBetween(User user, LocalDate startDate, LocalDate endDate);
 
@@ -53,7 +53,6 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
     @Query("SELECT ws.completedAt FROM WorkoutSession ws WHERE ws.user = :user AND ws.completedAt IS NOT NULL ORDER BY ws.completedAt DESC")
     List<LocalDateTime> findCompletedAtTimestampsByUserOrderByCompletedAtDesc(@Param("user") User user);
 
-
     /**
      * Busca sessões de treino para um usuário em uma data específica que ainda não foram concluídas
      * (completedAt é nulo). Ordena pelo ID decrescente para obter a mais recente criada
@@ -64,5 +63,15 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
      * @return Lista de WorkoutSession não concluídas para o dia especificado.
      */
     List<WorkoutSession> findByUserAndSessionDateAndCompletedAtIsNullOrderByIdDesc(User user, LocalDate sessionDate);
+
+    /**
+     * Conta o número de sessões de treino concluídas (completedAt IS NOT NULL)
+     * para um usuário específico.
+     *
+     * @param user O usuário.
+     * @return O número de sessões de treino concluídas.
+     */
+    @Query("SELECT COUNT(ws) FROM WorkoutSession ws WHERE ws.user = :user AND ws.completedAt IS NOT NULL")
+    long countByUserAndCompletedAtIsNotNull(@Param("user") User user);
 
 }

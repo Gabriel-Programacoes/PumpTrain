@@ -17,15 +17,24 @@ public class Achievement {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String achievementKey; // Um identificador único textual (ex: "FIRST_WORKOUT", "10_WORKOUTS")
+    private String achievementKey;
 
     @Column(nullable = false, length = 100)
-    private String name; // Nome visível da conquista (ex: "Primeiro Treino!")
+    private String name;
 
     @Column(nullable = false, length = 255)
-    private String description; // Descrição do que fazer para ganhar
+    private String description;
 
-    @Column // Opcional: Caminho para um ícone
+    @Column
     private String iconUrl;
+
+    @Column(length = 50)
+    private String category;
+
+    @Column(length = 30)
+    private String rarity;
+
+    @Column
+    private Integer targetValue;
 
 }
