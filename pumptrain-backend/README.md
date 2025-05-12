@@ -1,8 +1,8 @@
-﻿# PumpTrain - Backend API
+# Pumptrain - Backend API
 
 ## Descrição
 
-Este projeto é a API backend para a aplicação PumpTrain, um rastreador de treinos de academia. Ele fornece endpoints RESTful para gerenciar usuários, autenticação, exercícios, sessões de treino e os registros de atividades dentro dessas sessões.
+Este projeto é a API backend para a aplicação Pumptrain, um rastreador de treinos de academia. Ele fornece endpoints RESTful para gerenciar usuários (autenticação, perfil), exercícios, sessões de treino (criação, listagem, detalhe, atualização, conclusão), estatísticas de usuário e um sistema básico de conquistas.
 
 ## Tecnologias Utilizadas
 
@@ -19,22 +19,32 @@ Este projeto é a API backend para a aplicação PumpTrain, um rastreador de tre
 ## Funcionalidades Principais
 
 * **Autenticação e Autorização:**
-    * Registro de novos usuários.
+    * Registro de novos usuários (`name`, `email`, `password`).
     * Login de usuários com retorno de token JWT.
     * Proteção de endpoints baseada em autenticação JWT.
+* **Gerenciamento de Perfil de Usuário:**
+    * Busca de dados do perfil do usuário autenticado (`id`, `name`, `email`, `createdAt`, `age`, `height`, `weight`).
+    * Atualização de dados do perfil do usuário autenticado (`name`, `age`, `height`, `weight`).
 * **Gerenciamento de Exercícios:**
     * Listagem de todos os exercícios cadastrados (público).
     * Criação de novos exercícios (requer autenticação).
     * Deleção de exercícios (requer autenticação).
     * Inicialização de dados com exercícios de exemplo.
 * **Gerenciamento de Sessões de Treino:**
-    * Criação de novas sessões de treino, incluindo atividades associadas (requer autenticação).
+    * Criação de novas sessões de treino (começam como não concluídas), incluindo atividades associadas (requer autenticação).
     * Listagem das sessões de treino do usuário autenticado.
-    * Busca dos detalhes de uma sessão de treino específica (incluindo atividades).
-    * Atualização de uma sessão de treino existente (incluindo substituição das atividades).
+    * Busca dos detalhes de uma sessão de treino específica (incluindo atividades e status de conclusão).
+    * Atualização de uma sessão de treino existente (substituição completa dos dados da sessão e atividades).
+    * Marcação de um treino como concluído (registra `completedAt`).
     * Deleção de uma sessão de treino (e suas atividades associadas via cascata).
-* **Gerenciamento de Atividades (dentro das Sessões):**
-    * Adição, atualização e deleção de atividades individuais associadas a uma sessão (endpoints separados em `ActivityLogController`, embora a criação/atualização principal ocorra via `WorkoutSessionController`).
+    * Endpoint para buscar o "Treino do Dia" (treino mais recente agendado para hoje e ainda não concluído).
+* **Estatísticas do Usuário:**
+    * Endpoint para buscar estatísticas agregadas do usuário autenticado: total de treinos registrados, treinos concluídos no mês atual, sequência atual de dias de treino concluídos, recorde de sequência.
+* **Conquistas (Achievements):**
+    * Estrutura básica implementada para definir conquistas (`Achievement`) e registrar conquistas desbloqueadas por usuários (`UserAchievement`).
+    * Endpoint para buscar um resumo das conquistas do usuário (total desbloqueado, total disponível, lista das mais recentes).
+    * Inicialização de dados com definições de conquistas de exemplo.
+    * *(Lógica para conceder conquistas automaticamente ainda não implementada).*
 
 ## Estrutura do Projeto
 
@@ -42,15 +52,15 @@ O projeto segue uma arquitetura em camadas padrão para aplicações Spring Boot
 
 * `com.pumptrain.pumptrain`
     * `config`: Classes de configuração (Spring Security, CORS, Inicializador de Dados, Filtro JWT, Propriedades JWT).
-    * `controller`: Controladores REST que expõem os endpoints da API e lidam com requisições/respostas HTTP.
+    * `controller`: Controladores REST (`AuthController`, `ExerciseController`, `WorkoutSessionController`, `ActivityLogController`, `UserController`).
         * `advice`: Handlers globais de exceção.
-    * `dto`: Data Transfer Objects usados para definir a estrutura dos dados nas requisições e respostas da API, e para validação.
-    * `entity`: Classes de entidade JPA que representam as tabelas do banco de dados.
-    * `exception`: Classes de exceção customizadas.
-    * `mapper`: Interfaces MapStruct para mapeamento entre Entidades e DTOs.
-    * `repository`: Interfaces Spring Data JPA para acesso aos dados.
-    * `service`: Classes de serviço que contêm a lógica de negócio da aplicação.
-    * `PumptrainApplication.java`: Classe principal da aplicação Spring Boot.
+    * `dto`: Data Transfer Objects (`UserRegistrationDto`, `LoginRequestDto`, `UserProfileDto`, `UserProfileUpdateDto`, `UserStatsDto`, `AchievementDto`, `UserAchievementsDto`, `ExerciseDto`, `WorkoutSessionDto`, `ActivityLogDto`, etc.).
+    * `entity`: Entidades JPA (`User`, `Exercise`, `WorkoutSession`, `ActivityLog`, `Achievement`, `UserAchievement`).
+    * `exception`: Exceções customizadas (`DuplicateEmailException`).
+    * `mapper`: Interfaces MapStruct (`ActivityLogMapper`, `ExerciseMapper`, `WorkoutSessionMapper`, `UserMapper`).
+    * `repository`: Repositórios Spring Data JPA (`UserRepository`, `ExerciseRepository`, `WorkoutSessionRepository`, `ActivityLogRepository`, `AchievementRepository`, `UserAchievementRepository`).
+    * `service`: Serviços com a lógica de negócio (`UserService`, `ExerciseService`, `WorkoutSessionService`, `JwtService`, `JpaUserDetailsService`, `AchievementService`).
+    * `PumptrainApplication.java`: Classe principal.
 * `src/main/resources`
     * `application.properties`: Arquivo de configuração principal.
 
@@ -58,76 +68,60 @@ O projeto segue uma arquitetura em camadas padrão para aplicações Spring Boot
 
 As principais configurações estão no arquivo `src/main/resources/application.properties`:
 
-* **Porta do Servidor:** `server.port=9970`
-* **Banco de Dados H2:**
-    * URL: `jdbc:h2:file:./data/pumptraindb` (arquivo na pasta `data` na raiz do projeto)
-    * Usuário: `sa`
-    * Senha: `password`
-* **Console H2:** Habilitado em `/h2-console`
-* **JWT:**
-    * Segredo (`app.jwt.secret`): Chave usada para assinar os tokens. **IMPORTANTE:** Em produção, este valor NUNCA deve estar hardcoded no arquivo. Use variáveis de ambiente ou um sistema de gerenciamento de segredos.
-    * Expiração (`app.jwt.expiration-ms`): Tempo de validade do token em milissegundos.
-* **Logging:** Configurado para nível INFO para a aplicação e WARN para o root, com saída para o arquivo `logs/pumptrain-app.log`.
+* **Porta:** `9970` (ou a porta configurada).
+* **Banco H2:** Arquivo em `./data/pumptraindb`, usuário `sa`, senha `password`.
+* **Console H2:** Habilitado em `/h2-console`.
+* **JWT:** Segredo e tempo de expiração configurados. **IMPORTANTE:** O segredo (`app.jwt.secret`) deve ser externalizado em produção.
+* **DDL Auto:** `update` (Hibernate tenta atualizar o schema). Mudar para `validate` em produção é recomendado.
+* **Logging:** Saída para console e arquivo `logs/pumptrain-app.log`.
 
 ## Como Executar
 
-1.  **Pré-requisitos:**
-    * JDK 21 ou superior instalado.
-    * Maven instalado.
-2.  **Clonar o Repositório:** (Se aplicável)
-    ```bash
-    git clone https://github.com/Gabriel-Programacoes/PumpTrain.git
-    cd pumptrain-backend
-    ```
-3.  **Compilar o Projeto:**
-    ```bash
-    mvn clean compile
-    ```
-4.  **Executar a Aplicação:**
-    ```bash
-    mvn spring-boot:run
-    ```
-    A aplicação estará disponível em `http://localhost:9977`.
+1.  **Pré-requisitos:** JDK 21+, Maven.
+2.  **Compilar:** `mvn clean compile`
+3.  **Executar:** `mvn spring-boot:run`
+4.  **Acessar:** `http://localhost:9970` (ou a porta configurada)
 
 ## Banco de Dados (H2 Console)
 
-Durante o desenvolvimento, você pode acessar o console web do H2 para inspecionar o banco de dados:
-
-1.  Com a aplicação rodando, acesse `http://localhost:9970/h2-console` no seu navegador.
-2.  Use as seguintes credenciais (do `application.properties`):
+1.  Aplicação rodando.
+2.  Acesse `http://localhost:9970/h2-console`.
+3.  Use as credenciais do `application.properties`:
     * **JDBC URL:** `jdbc:h2:file:./data/pumptraindb`
     * **User Name:** `sa`
     * **Password:** `password`
-3.  Clique em "Connect". Você poderá ver as tabelas e executar queries SQL.
+4.  Conecte-se para inspecionar as tabelas (`USERS`, `EXERCISES`, `WORKOUT_SESSIONS`, `ACTIVITY_LOGS`, `ACHIEVEMENTS`, `USER_ACHIEVEMENTS`) e executar SQL.
 
 ## Segurança
 
-* A autenticação é feita via JWT. O cliente deve enviar o token JWT obtido no login no cabeçalho `Authorization` como `Bearer <token>` para acessar endpoints protegidos.
-* As senhas dos usuários são armazenadas usando BCrypt.
-* A configuração de CORS permite requisições de origens específicas (configuradas em `SecurityConfig.java`), essencial para integração com frontend.
+* Autenticação via JWT (Bearer Token no header `Authorization`).
+* Senhas armazenadas com BCrypt.
+* CORS configurado em `SecurityConfig.java` para permitir origens específicas do frontend.
+* Endpoints protegidos exigindo autenticação, exceto `/auth/**`, `GET /api/exercises`, `/h2-console/**` e Swagger UI.
 
-## API Endpoints
+## API Endpoints Principais
 
-Aqui estão os principais endpoints da API:
-
-| Método HTTP | Path                     | Autenticação? | Descrição                                                                 | Controller                         |
-| :---------- | :----------------------- | :------------ | :------------------------------------------------------------------------ | :--------------------------------- |
-| POST        | `/auth/register`         | Não           | Registra um novo usuário.                                                   | `AuthController`         |
-| POST        | `/auth/login`            | Não           | Autentica um usuário e retorna um token JWT.                              | `AuthController`         |
-| GET         | `/api/exercises`         | Não           | Lista todos os exercícios cadastrados.                                    | `ExerciseController`     |
-| POST        | `/api/exercises`         | Sim           | Cria um novo exercício.                                                   | `ExerciseController`     |
-| DELETE      | `/api/exercises/{id}`    | Sim           | Deleta um exercício existente.                                            | `ExerciseController`     |
-| GET         | `/api/workouts`          | Sim           | Lista as sessões de treino do usuário autenticado.                        | `WorkoutSessionController` |
-| POST        | `/api/workouts`          | Sim           | Cria uma nova sessão de treino (incluindo atividades).                    | `WorkoutSessionController` |
-| GET         | `/api/workouts/{id}`     | Sim           | Busca os detalhes de uma sessão de treino específica (inclui atividades). | `WorkoutSessionController` |
-| PUT         | `/api/workouts/{id}`     | Sim           | Atualiza uma sessão de treino existente (substituição completa).        | `WorkoutSessionController` |
-| DELETE      | `/api/workouts/{id}`     | Sim           | Deleta uma sessão de treino (e suas atividades).                          | `WorkoutSessionController` |
-| PUT         | `/api/activities/{id}`   | Sim           | Atualiza uma atividade específica.                                        | `ActivityLogController`    |
-| DELETE      | `/api/activities/{id}`   | Sim           | Deleta uma atividade específica.                                          | `ActivityLogController`    |
-
-_(Nota: A criação de atividades também ocorre implicitamente via `POST /api/workouts`)_
+| Método | Path                               | Auth? | Descrição                                                                              |
+| :----- | :--------------------------------- | :---- | :------------------------------------------------------------------------------------- |
+| POST   | `/auth/register`                   | Não   | Registra novo usuário.                                                                 |
+| POST   | `/auth/login`                      | Não   | Autentica usuário, retorna token JWT.                                                  |
+| GET    | `/api/exercises`                   | Não   | Lista todos os exercícios.                                                             |
+| POST   | `/api/exercises`                   | Sim   | Cria um novo exercício.                                                                |
+| DELETE | `/api/exercises/{id}`              | Sim   | Deleta um exercício.                                                                   |
+| GET    | `/api/workouts`                    | Sim   | Lista os treinos do usuário logado.                                                    |
+| POST   | `/api/workouts`                    | Sim   | Cria um novo treino (e suas atividades).                                               |
+| GET    | `/api/workouts/{id}`               | Sim   | Busca detalhes de um treino específico.                                                |
+| PUT    | `/api/workouts/{id}`               | Sim   | Atualiza um treino existente (substituição completa).                                  |
+| DELETE | `/api/workouts/{id}`               | Sim   | Deleta um treino (e suas atividades).                                                  |
+| POST   | `/api/workouts/{id}/complete`      | Sim   | Marca um treino como concluído (define `completedAt`).                                 |
+| GET    | `/api/workouts/today`              | Sim   | Busca o "Treino do Dia" (mais recente de hoje, não concluído). Retorna 204 se não houver. |
+| PUT    | `/api/activities/{id}`             | Sim   | Atualiza uma atividade específica (usado menos frequentemente, talvez).             |
+| DELETE | `/api/activities/{id}`             | Sim   | Deleta uma atividade específica (usado menos frequentemente, talvez).              |
+| GET    | `/api/user/profile`                | Sim   | Busca o perfil do usuário logado (`id`, `name`, `email`, `createdAt`, `age`...).     |
+| PUT    | `/api/user/profile`                | Sim   | Atualiza o perfil do usuário logado (`name`, `age`, `height`, `weight`).                 |
+| GET    | `/api/user/stats`                  | Sim   | Busca estatísticas do usuário (total treinos, mês atual, streaks).                   |
+| GET    | `/api/user/achievements`           | Sim   | Busca resumo de conquistas do usuário (contagens, recentes).                           |
 
 ## Tratamento de Erros
 
-* Um `GlobalExceptionHandler` intercepta exceções comuns e customizadas, retornando respostas de erro padronizadas no formato `ErrorResponseDto` com status HTTP apropriados (400, 401, 403, 404, 409, 500).
-* Erros de validação de DTOs retornam status 400 com detalhes sobre os campos inválidos.
+* `GlobalExceptionHandler` captura exceções e retorna respostas JSON padronizadas (`ErrorResponseDto`) com status HTTP apropriados (400, 401, 403, 404, 409, 500).
