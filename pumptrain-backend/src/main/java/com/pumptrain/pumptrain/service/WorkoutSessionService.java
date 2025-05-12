@@ -37,6 +37,7 @@ public class WorkoutSessionService {
     private final ExerciseRepository exerciseRepository;
     private final ActivityLogMapper activityLogMapper;
     private final WorkoutSessionMapper workoutSessionMapper;
+    private final AchievementService achievementService;
 
     @Autowired
     public WorkoutSessionService(WorkoutSessionRepository workoutSessionRepository,
@@ -44,13 +45,14 @@ public class WorkoutSessionService {
                                  UserRepository userRepository,
                                  ExerciseRepository exerciseRepository,
                                  ActivityLogMapper activityLogMapper,
-                                 WorkoutSessionMapper workoutSessionMapper) {
+                                 WorkoutSessionMapper workoutSessionMapper, AchievementService achievementService) {
         this.workoutSessionRepository = workoutSessionRepository;
         this.activityLogRepository = activityLogRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
         this.activityLogMapper = activityLogMapper;
         this.workoutSessionMapper = workoutSessionMapper;
+        this.achievementService = achievementService;
     }
 
     // --- Operações de Sessão ---
@@ -484,8 +486,19 @@ public class WorkoutSessionService {
         WorkoutSession savedSession = workoutSessionRepository.save(session);
         log.info("Treino ID {} marcado como concluído com sucesso.", sessionId);
 
+        try {
+            log.info(">>> PRESTES A CHAMAR achievementService.checkAndAwardAchievements para usuário {} <<<", user.getEmail());
+            achievementService.checkAndAwardAchievements(user);
+            log.info(">>> achievementService.checkAndAwardAchievements CHAMADO com sucesso <<<");
+        } catch (Exception e) {
+            log.error("Erro ao verificar/conceder conquistas para o usuário {} [...]: {}",
+                    user.getEmail(), e.getMessage(), e);
+        }
+
         return workoutSessionMapper.toDto(savedSession);
     }
+
+
 
     @Transactional(readOnly = true)
     public Optional<WorkoutSessionDto> getWorkoutOfTheDay(String userEmail) {

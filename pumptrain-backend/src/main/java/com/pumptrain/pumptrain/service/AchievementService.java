@@ -1,6 +1,7 @@
 package com.pumptrain.pumptrain.service;
 
 import com.pumptrain.pumptrain.dto.FullAchievementDto;
+// import com.pumptrain.pumptrain.dto.AchievementDto; // Importação do DTO simples, usado no resumo
 import com.pumptrain.pumptrain.dto.UserAchievementsDto;
 import com.pumptrain.pumptrain.entity.Achievement;
 import com.pumptrain.pumptrain.entity.User;
@@ -9,7 +10,7 @@ import com.pumptrain.pumptrain.repository.AchievementRepository;
 import com.pumptrain.pumptrain.repository.UserAchievementRepository;
 import com.pumptrain.pumptrain.repository.UserRepository;
 import com.pumptrain.pumptrain.repository.WorkoutSessionRepository;
-import com.pumptrain.pumptrain.service.UserService.StreakInfo;
+import com.pumptrain.pumptrain.service.UserService.StreakInfo; // Assumindo que StreakInfo foi tornado público/acessível
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +46,10 @@ public class AchievementService {
         long unlockedCount = userAchievementRepository.countByUser(user);
         long totalAvailable = achievementRepository.count();
 
-        Pageable limit = PageRequest.of(0, 3);
+        Pageable limit = PageRequest.of(0, 3); // Exemplo: buscar as 3 mais recentes
         List<UserAchievement> recentUserAchievements = userAchievementRepository.findByUserOrderByUnlockedTimestampDesc(user, limit);
 
-        // Usando o DTO simples 'AchievementDto' para o resumo.
+        // Usando o DTO simples 'com.pumptrain.pumptrain.dto.AchievementDto' para o resumo.
         List<com.pumptrain.pumptrain.dto.AchievementDto> recentAchievementsDto = recentUserAchievements.stream()
                 .map(ua -> new com.pumptrain.pumptrain.dto.AchievementDto(
                         ua.getAchievement().getAchievementKey(),
@@ -72,16 +73,15 @@ public class AchievementService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado: " + userEmail));
 
         List<Achievement> allDefinedAchievements = achievementRepository.findAll();
-        List<UserAchievement> userUnlockedAchievements = userAchievementRepository.findByUser(user);
-
-        Map<Long, UserAchievement> unlockedMap = userUnlockedAchievements.stream()
+        // Otimização: Buscar uma vez e colocar em um Map para consulta rápida
+        Map<Long, UserAchievement> unlockedMap = userAchievementRepository.findByUser(user).stream()
                 .collect(Collectors.toMap(ua -> ua.getAchievement().getId(), ua -> ua));
 
         List<FullAchievementDto> resultList = new ArrayList<>();
 
-        // Pré-calcular estatísticas do usuário uma vez, se possível
+        // Pré-calcular estatísticas do usuário uma vez para evitar chamadas repetidas no loop
         long totalCompletedWorkouts = workoutSessionRepository.countByUserAndCompletedAtIsNotNull(user);
-        StreakInfo userStreaks = userService.calculateStreaksBasedOnCompletion(user);
+        StreakInfo userStreaks = userService.calculateStreaksBasedOnCompletion(user); // Assumindo que este método existe e é acessível
 
         for (Achievement achievement : allDefinedAchievements) {
             UserAchievement userAchievement = unlockedMap.get(achievement.getId());
@@ -103,21 +103,29 @@ public class AchievementService {
                 case "STREAK_7_DAYS":
                     currentProgress = Math.min(userStreaks.recordStreak(), targetValue);
                     break;
+                // Adicionar outros casos aqui conforme novas conquistas com lógica de progresso são definidas
                 default:
+                    // Se desbloqueado e sem lógica de progresso específica, considera completo
                     currentProgress = isUnlocked ? targetValue : 0;
             }
 
+            // Calcula a porcentagem de progresso
             if (targetValue > 0) {
                 progressPercentage = Math.min(1.0, (double) currentProgress / targetValue);
-            } else if (isUnlocked) { // Para conquistas sem targetValue (ex: uma ação única), se desbloqueado, é 100%
+            } else if (isUnlocked) { // Para conquistas sem targetValue (ex: uma ação única que só tem desbloqueado/não)
                 progressPercentage = 1.0;
-                currentProgress = targetValue;
-            }
-            if(isUnlocked) {
-                progressPercentage = 1.0;
-                currentProgress = targetValue;
+                // Se targetValue é 0, mas está desbloqueado, currentProgress pode ser 0 ou 1 (representando o "ato" de desbloquear)
+                // Para consistência visual, se targetValue é 0, e está desbloqueado, current pode ser 1 e total 1.
+                // No entanto, se targetValue é usado para exibir "X de Y", e Y é 0, pode ser confuso.
+                // A lógica atual com targetValue = 0 e isUnlocked = true fará progressPercentage = 1.0, currentProgress = 0.
+                // Vamos ajustar para que, se desbloqueado, current seja igual a target
             }
 
+            // Garante que se estiver desbloqueado, o progresso seja 100% e current seja igual ao total
+            if (isUnlocked) {
+                progressPercentage = 1.0;
+                currentProgress = targetValue; // Se targetValue é 0, current será 0. Se é >0, será o target.
+            }
 
             resultList.add(FullAchievementDto.builder()
                     .id(achievement.getId())
@@ -126,6 +134,7 @@ public class AchievementService {
                     .iconName(achievement.getIconUrl())
                     .category(achievement.getCategory())
                     .rarity(achievement.getRarity())
+                    // XP foi removido
                     .unlocked(isUnlocked)
                     .progress(progressPercentage)
                     .total(targetValue)
@@ -137,61 +146,63 @@ public class AchievementService {
         return resultList;
     }
 
-
-    // --- Métodos Futuros para CONCEDER conquistas ---
     @Transactional
-    public void checkAndAwardAchievements(User user /*, Optional<WorkoutSession> workoutSession, etc. */) {
+    public void checkAndAwardAchievements(User user) {
         log.info("Verificando e concedendo conquistas para o usuário: {}", user.getEmail());
         List<Achievement> allDefinedAchievements = achievementRepository.findAll();
         long totalCompletedWorkouts = workoutSessionRepository.countByUserAndCompletedAtIsNotNull(user);
-        StreakInfo userStreaks = userService.calculateStreaksBasedOnCompletion(user);
+        StreakInfo userStreaks = userService.calculateStreaksBasedOnCompletion(user); // Chamada ao método refatorado
+
+        // Logs de depuração para os valores base que serão usados nas verificações
+        log.info("Valores para verificação de conquistas - Usuário: {}", user.getEmail());
+        log.info("- totalCompletedWorkouts: {}", totalCompletedWorkouts);
+        log.info("- userStreaks.recordStreak(): {}", userStreaks.recordStreak());
+        log.info("- userStreaks.currentStreak(): {}", userStreaks.currentStreak()); // Embora não usado diretamente nos critérios atuais
 
         for (Achievement achievement : allDefinedAchievements) {
-            // Verifica se o usuário já desbloqueou esta conquista
             boolean alreadyUnlocked = userAchievementRepository.existsByUserAndAchievement(user, achievement);
             if (alreadyUnlocked) {
-                continue; // Pula para a próxima
+                log.trace("Conquista '{}' ({}) já desbloqueada para {}. Pulando.", achievement.getName(), achievement.getAchievementKey(), user.getEmail());
+                continue;
             }
 
             boolean criteriaMet = false;
             Integer targetValue = achievement.getTargetValue();
-            if (targetValue == null) targetValue = 0; // Default para evitar NPE
+            if (targetValue == null) targetValue = 0; // Garante que targetValue não é nulo para comparações
+
+            log.info("Verificando conquista: '{}' ({}), Target: {}", achievement.getName(), achievement.getAchievementKey(), targetValue);
 
             switch (achievement.getAchievementKey()) {
                 case "FIRST_WORKOUT":
-                    if (totalCompletedWorkouts >= targetValue) { // targetValue deve ser 1
+                    log.info("  FIRST_WORKOUT: Checando se totalCompletedWorkouts ({}) >= targetValue ({})", totalCompletedWorkouts, targetValue);
+                    if (totalCompletedWorkouts >= targetValue) {
                         criteriaMet = true;
                     }
                     break;
                 case "TEN_WORKOUTS":
-                    if (totalCompletedWorkouts >= targetValue) { // targetValue deve ser 10
+                    log.info("  TEN_WORKOUTS: Checando se totalCompletedWorkouts ({}) >= targetValue ({})", totalCompletedWorkouts, targetValue);
+                    if (totalCompletedWorkouts >= targetValue) {
                         criteriaMet = true;
                     }
                     break;
                 case "STREAK_7_DAYS":
-                    if (userStreaks.recordStreak() >= targetValue) { // targetValue deve ser 7
+                    log.info("  STREAK_7_DAYS: Checando se userStreaks.recordStreak() ({}) >= targetValue ({})", userStreaks.recordStreak(), targetValue);
+                    if (userStreaks.recordStreak() >= targetValue) {
                         criteriaMet = true;
                     }
                     break;
-                // Adicionar lógica para "PERFECT_MONTH" se/quando implementado
-                // case "PERFECT_MONTH":
-                //     int completedThisMonth = workoutSessionRepository.countByUserAndCompletedAtBetween(user, YearMonth.now().atDay(1).atStartOfDay(), YearMonth.now().atEndOfMonth().atTime(LocalTime.MAX));
-                //     if (completedThisMonth >= targetValue) {
-                //         criteriaMet = true;
-                //     }
-                //     break;
-                // Adicionar outros casos aqui
+                // Adicionar outros casos para "PERFECT_MONTH", etc.
             }
 
+            log.debug("  CriteriaMet para '{}': {}", achievement.getAchievementKey(), criteriaMet);
+
             if (criteriaMet) {
-                UserAchievement newUserAchievement = new UserAchievement(null, user, achievement, null); // Timestamp é auto-gerado via @PrePersist
+                UserAchievement newUserAchievement = new UserAchievement(null, user, achievement, null); // Timestamp é auto-gerado
                 userAchievementRepository.save(newUserAchievement);
                 log.info("CONQUISTA DESBLOQUEADA! Usuário: {}, Conquista: '{}' ({})",
                         user.getEmail(), achievement.getName(), achievement.getAchievementKey());
-                // Aqui você poderia disparar uma notificação, etc.
+                // Potencialmente disparar notificação para o usuário aqui
             }
         }
     }
-    // Nota: O método checkAndAwardAchievements deve ser chamado em pontos estratégicos,
-    // por exemplo, após um WorkoutSession ser marcado como concluído.
 }
