@@ -1,25 +1,23 @@
-// src/pages/RegisterPage.tsx (ou caminho que preferir)
-
 import React, { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { useAuth } from '../../context/AuthContext'; // Da base funcional
-import apiClient from '../../api/apiClient';       // Da base funcional
-import { AxiosError } from 'axios';              // Da base funcional
+import { useAuth } from '../../context/AuthContext';
+import apiClient from '../../api/apiClient';
+import { AxiosError } from 'axios';
 
-// MUI Imports (combinados)
+// MUI Imports
 import {
     Box, Container, Typography, TextField, Button, Grid, Link, Checkbox, FormControlLabel,
     Paper, IconButton, InputAdornment, useMediaQuery, useTheme, Alert,
-    CircularProgress, Stepper, Step, StepLabel, Stack, FormHelperText, FormControl, FormLabel // Adicionado Stepper, Stack, FormHelperText, etc.
+    CircularProgress, Stepper, Step, StepLabel, Stack, FormHelperText, FormControl, FormLabel
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 // Ícones necessários
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"; // Para botão Voltar no Stepper
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-// --- Componentes Estilizados (da primeira versão) ---
+// --- Componentes Estilizados  ---
 const RegisterContainer = styled(Box)(({ theme }) => ({
     minHeight: "100vh",
     display: "flex",
@@ -137,14 +135,9 @@ const RegisterPage: React.FC = () => {
             handleSubmit();
         }
     };
-
-    const handleBack = () => {
-        setActiveStep(prevActiveStep => prevActiveStep - 1);
-    };
-
-    // Submit Final (lógica da base funcional, adaptada para os campos corretos)
+// Submit Final
     const handleSubmit = async () => {
-        // Validação final (redundante se veio do handleNext, mas seguro)
+        // Validação final
         if (!validateStep0()) {
             setActiveStep(0); // Volta para o passo com erros se chegou aqui de alguma forma
             return;
@@ -343,7 +336,17 @@ const RegisterPage: React.FC = () => {
                     {!isMobile && (
                         <Grid size={{xs: 12, md: 6} } sx={{ zIndex: 1 }}>
                             <Box sx={{ p: 4 }}>
-                                <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+                                <Box
+                                    component={RouterLink}
+                                    to="/"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        mb: 4,
+                                        textDecoration: 'none',
+                                        color: 'inherit'
+                                    }}
+                                >
                                     <FitnessCenterIcon sx={{ color: "primary.main", fontSize: 40, mr: 1 }} />
                                     <Typography variant="h4" component="div" sx={{ fontWeight: "bold", letterSpacing: 1, textTransform: "uppercase", color: "primary.main" }}>
                                         PumpTrain
@@ -377,8 +380,8 @@ const RegisterPage: React.FC = () => {
                                 </Box>
                             )}
 
-                            {/* Botão Voltar para Login (opcional no topo) */}
-                            {/* <IconButton component={RouterLink} to="/login" sx={{ position: 'absolute', top: 16, left: 16 }}><ArrowBackIcon /></IconButton> */}
+                            {/* Botão para voltar para a LandingPage*/}
+                            <IconButton component={RouterLink} to="/" sx={{ position: 'absolute', top: 16, left: 16 }}><ArrowBackIcon /></IconButton>
 
                             <Typography variant="h5" component="h2" sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}>
                                 Criar Conta
@@ -398,16 +401,7 @@ const RegisterPage: React.FC = () => {
                             </Box>
 
                             {/* Botões de Navegação do Stepper */}
-                            <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ mt: 4 }}>
-                                <Button
-                                    color="inherit"
-                                    disabled={activeStep === 0 || isLoading}
-                                    onClick={handleBack}
-                                    sx={{ borderRadius: 2 }}
-                                    startIcon={<ArrowBackIcon />}
-                                >
-                                    Voltar
-                                </Button>
+                            <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 4 }}>
                                 <Button
                                     variant="contained"
                                     onClick={handleNext}

@@ -17,6 +17,7 @@ import AppleIcon from "@mui/icons-material/Apple";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 // --- Componentes Estilizados  ---
 const LoginContainer = styled(Box)(({ theme }) => ({
@@ -171,7 +172,17 @@ const LoginPage: React.FC = () => {
                     {!isMobile && (
                         <Grid size={{xs: 12, md: 6} } sx={{ zIndex: 1 }}>
                             <Box sx={{ p: 4 }}>
-                                <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+                                <Box
+                                    component={RouterLink}
+                                    to="/"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        mb: 4,
+                                        textDecoration: 'none',
+                                        color: 'inherit'
+                                    }}
+                                >
                                     <FitnessCenterIcon sx={{ color: "primary.main", fontSize: 40, mr: 1 }} />
                                     <Typography
                                         variant="h4" component="div"
@@ -218,10 +229,13 @@ const LoginPage: React.FC = () => {
                                 </Box>
                             )}
 
-                            <Typography variant="h5" component="h2" sx={{ fontWeight: 700, mb: 1, textAlign: isMobile ? "center" : "left" }} >
+                            {/* Botão para voltar para a LandingPage*/}
+                            <IconButton component={RouterLink} to="/" sx={{ position: 'absolute', top: 16, left: 16 }}><ArrowBackIcon /></IconButton>
+
+                            <Typography variant="h5" component="h2" sx={{ fontWeight: 700, mb: 1, textAlign: isMobile ? "center" : "center"}} >
                                 Entrar
                             </Typography>
-                            <Typography variant="body2" sx={{ color: "text.secondary", mb: 3, textAlign: isMobile ? "center" : "left" }} >
+                            <Typography variant="body2" sx={{ color: "text.secondary", mb: 3, textAlign: isMobile ? "center" : "center" }} >
                                 Entre com suas credenciais para acessar sua conta
                             </Typography>
 

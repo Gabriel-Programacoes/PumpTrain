@@ -11,8 +11,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/pt-br';
 
 // Componentes de Layout e Páginas
-import Layout from './components/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage/LandingPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
@@ -22,7 +20,12 @@ import CreateWorkoutPage from './pages/CreateWorkoutPage/CreateWorkoutPage';
 import WorkoutDetailPage from './pages/WorkoutDetailPage/WorkoutDetailPage';
 import EditWorkoutPage from './pages/EditWorkoutPage/EditWorkoutPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
+import AchievementsPage from './pages/AchievementsPage/AchievementsPage';
 // import HomePage from "./pages/HomePage/HomePage.tsx";
+
+
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard';
 
 // Componente NotFound simples
@@ -56,6 +59,8 @@ function App() {
                                     <Route path="/workouts/new" element={<CreateWorkoutPage />} />
                                     <Route path="/workouts/:workoutId" element={<WorkoutDetailPage />} />
                                     <Route path="/workouts/:workoutId/edit" element={<EditWorkoutPage />} />
+                                    <Route path="/achievements/all" element={<AchievementsPage />} />
+
                                 </Route>
                                 <Route path="*" element={<NotFound />} />
                             </Route>

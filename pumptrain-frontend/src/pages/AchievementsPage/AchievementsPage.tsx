@@ -1,739 +1,283 @@
-"use client"
-
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react";
 import {
-    Box,
-    Typography,
-    Card,
-    CardContent,
-    Grid,
-    Chip,
-    LinearProgress,
-    Avatar,
-    Container,
-    Tabs,
-    Tab,
-    Divider,
-    Button,
-    useMediaQuery,
-    useTheme,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-} from "@mui/material"
+    Box, Typography, Card, CardContent, Grid, Chip, LinearProgress,
+    Avatar, Container, Tabs, Tab, Divider, Button,
+    useMediaQuery, useTheme, Dialog, DialogTitle, DialogContent,
+    DialogActions, Skeleton, Alert, alpha
+} from "@mui/material";
 import {
     EmojiEvents as TrophyIcon,
-    LocalFireDepartment as FireIcon,
-    FitnessCenter as DumbbellIcon,
-    DirectionsRun as RunIcon,
-    Whatshot as HotstreakIcon,
     CalendarMonth as CalendarIcon,
-    Timer as TimerIcon,
-    Bolt as BoltIcon,
-    Favorite as HeartIcon,
-    Star as StarIcon,
     Lock as LockIcon,
     Share as ShareIcon,
     Celebration as CelebrationIcon,
-} from "@mui/icons-material"
+} from "@mui/icons-material";
+// Hooks e Tipos
+import { useAllAchievementsQuery } from '../../hooks/useAllAchievementsQuery';
+import { FullAchievement } from "../../types/achievements";
 
-// Tipos
-interface Achievement {
-    id: number
-    title: string
-    description: string
-    icon: React.ReactNode
-    category: string
-    unlocked: boolean
-    progress?: number
-    total?: number
-    current?: number
-    date?: string
-    rarity: "comum" | "raro" | "épico" | "lendário"
-    xp: number
+// Utilitários
+import { a11yProps, mapIconNameToComponent, TabPanelProps } from "../../utils/uiHelpers";
+import { getRarityColor } from "../../utils/styleHelpers";
+import { formatDate } from "../../utils/formatters";
+
+function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`achievement-tabpanel-${index}`}
+            aria-labelledby={`achievement-tab-${index}`}
+            {...other}
+        >
+            {value === index && <Box sx={{ py: 3, px: { xs: 1, md: 2} }}>{children}</Box>}
+        </div>
+    );
 }
 
-// Componente de card de conquista
-const AchievementCard = ({
-                             achievement,
-                             onSelect,
-                         }: { achievement: Achievement; onSelect: (achievement: Achievement) => void }) => {
-    const theme = useTheme()
-    useMediaQuery(theme.breakpoints.down("sm"));
-
+// --- Componente AchievementCard ---
+interface AchievementCardProps {
+    achievement: FullAchievement;
+    onSelect: (achievement: FullAchievement) => void;
+}
+const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onSelect }) => {
+    const theme = useTheme();
     return (
         <Card
             variant="outlined"
             sx={{
-                height: "100%",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 4px 20px rgba(119, 204, 136, 0.15)",
-                },
-                position: "relative",
-                overflow: "visible",
-                opacity: achievement.unlocked ? 1 : 0.7,
+                height: "100%", display: 'flex', flexDirection: 'column',
+                cursor: "pointer", transition: "all 0.2s ease",
+                "&:hover": { transform: "translateY(-4px)", boxShadow: theme.shadows[4], borderColor: 'primary.main' },
+                position: "relative", overflow: "visible",
+                opacity: achievement.unlocked ? 1 : 0.6,
+                backgroundColor: achievement.unlocked ? theme.palette.action.hover : undefined,
             }}
             onClick={() => onSelect(achievement)}
         >
             {!achievement.unlocked && (
-                <Box
-                    sx={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        backgroundColor: "rgba(6, 7, 14, 0.7)",
-                        zIndex: 1,
-                        borderRadius: 1,
-                    }}
-                >
-                    <LockIcon sx={{ fontSize: 32, color: "rgba(255, 255, 252, 0.3)" }} />
+                <Box sx={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: 1, borderRadius: 'inherit' }}>
+                    <LockIcon sx={{ fontSize: 32, color: "rgba(255, 255, 252, 0.5)" }} />
                 </Box>
             )}
-
-            <Box
-                sx={{
-                    position: "absolute",
-                    top: -16,
-                    right: 16,
-                    zIndex: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
-            >
-                <Chip
-                    label={`${achievement.xp} XP`}
-                    size="small"
-                    sx={{
-                        bgcolor: "rgba(119, 204, 136, 0.2)",
-                        color: "primary.main",
-                        fontWeight: "bold",
-                        border: "1px solid rgba(119, 204, 136, 0.3)",
-                    }}
-                />
-            </Box>
-
-            <CardContent sx={{ p: 3 }}>
+            <CardContent sx={{ p: {xs: 2, sm: 3}, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <Avatar
-                        sx={{
-                            bgcolor: achievement.unlocked ? "primary.main" : "rgba(119, 204, 136, 0.2)",
-                            color: achievement.unlocked ? "#06070e" : "rgba(119, 204, 136, 0.5)",
-                            mr: 2,
-                            width: 48,
-                            height: 48,
-                        }}
-                    >
-                        {achievement.icon}
+                    <Avatar sx={{ bgcolor: achievement.unlocked ? "primary.main" : theme.palette.action.disabledBackground, color: achievement.unlocked ? theme.palette.getContrastText(theme.palette.primary.main) : theme.palette.action.disabled, mr: 2, width: 48, height: 48 }} >
+                        {mapIconNameToComponent(achievement.iconName)}
                     </Avatar>
-                    <Box>
-                        <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
-                            {achievement.title}
-                        </Typography>
-                        <Chip
-                            label={achievement.rarity}
-                            size="small"
-                            sx={{
-                                bgcolor: getRarityColor(achievement.rarity),
-                                color: "#06070e",
-                                textTransform: "uppercase",
-                                fontSize: "0.6rem",
-                                fontWeight: "bold",
-                                height: 20,
-                            }}
-                        />
-                    </Box>
+                    <Box sx={{ flexGrow: 1}}> <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}> {achievement.title} </Typography> <Chip label={achievement.rarity} size="small" sx={{ bgcolor: getRarityColor(achievement.rarity), color: theme.palette.getContrastText(getRarityColor(achievement.rarity)), textTransform: "uppercase", fontSize: "0.6rem", fontWeight: "bold", height: 20, }}/> </Box>
                 </Box>
-
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {achievement.description}
-                </Typography>
-
-                {achievement.progress !== undefined && (
-                    <Box sx={{ mt: 2 }}>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary">
-                                Progresso
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                {achievement.current}/{achievement.total}
-                            </Typography>
-                        </Box>
-                        <LinearProgress
-                            variant="determinate"
-                            value={achievement.progress}
-                            sx={{
-                                height: 6,
-                                borderRadius: 1,
-                                bgcolor: "rgba(255, 255, 252, 0.1)",
-                                "& .MuiLinearProgress-bar": {
-                                    bgcolor: achievement.unlocked ? "primary.main" : "rgba(119, 204, 136, 0.5)",
-                                },
-                            }}
-                        />
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: '40px', flexGrow: 1 }}> {achievement.description} </Typography>
+                {achievement.current !== undefined && achievement.total !== undefined && achievement.total > 0 && !achievement.unlocked && (
+                    <Box sx={{ mt: 'auto', pt: 1 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}><Typography variant="caption" color="text.secondary">Progresso</Typography><Typography variant="caption" color="text.secondary">{achievement.current}/{achievement.total}</Typography></Box>
+                        <LinearProgress variant="determinate" value={Math.min(100, (achievement.current / achievement.total) * 100)} sx={{ height: 6, borderRadius: 1, bgcolor: "action.disabledBackground", "& .MuiLinearProgress-bar": { bgcolor: "primary.light" } }}/>
                     </Box>
                 )}
-
-                {achievement.unlocked && achievement.date && (
-                    <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-                        <CalendarIcon sx={{ fontSize: 14, color: "text.secondary", mr: 0.5 }} />
-                        <Typography variant="caption" color="text.secondary">
-                            Conquistado em {achievement.date}
-                        </Typography>
-                    </Box>
-                )}
+                {achievement.unlocked && achievement.date && ( <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}><CalendarIcon sx={{ fontSize: 14, color: "text.secondary", mr: 0.5 }} /><Typography variant="caption" color="text.secondary">Conquistado em {formatDate(achievement.date, 'DD/MM/YY')}</Typography></Box> )}
             </CardContent>
         </Card>
-    )
-}
+    );
+};
+// --- Fim AchievementCard ---
 
-// Componente de diálogo de detalhes da conquista
-const AchievementDialog = ({
-                               open,
-                               achievement,
-                               onClose,
-                           }: {
-    open: boolean
-    achievement: Achievement | null
-    onClose: () => void
-}) => {
-    if (!achievement) return null
 
+// --- Componente AchievementDialog ---
+const AchievementDialog = ({ open, achievement, onClose }: { open: boolean; achievement: FullAchievement | null; onClose: () => void }) => {
+    const theme = useTheme();
+    if (!achievement) return null;
     return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-            maxWidth="sm"
-            fullWidth
-            PaperProps={{
+        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth slotProps={{ paper: {
                 sx: {
-                    bgcolor: "#06070e",
-                    backgroundImage: "radial-gradient(circle at top right, rgba(119, 204, 136, 0.1), transparent 70%)",
-                    border: "1px solid rgba(119, 204, 136, 0.1)",
-                    borderRadius: 2,
-                },
-            }}
-        >
+                    bgcolor: "background.paper",
+                    backgroundImage: "radial-gradient(circle at top right, rgba(119, 204, 136, 0.05), transparent 70%)",
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 2
+                }
+            } }} >
             <DialogTitle sx={{ textAlign: "center", pt: 4 }}>
-                <Avatar
-                    sx={{
-                        bgcolor: achievement.unlocked ? "primary.main" : "rgba(119, 204, 136, 0.2)",
-                        color: achievement.unlocked ? "#06070e" : "rgba(119, 204, 136, 0.5)",
-                        width: 80,
-                        height: 80,
-                        mx: "auto",
-                        mb: 2,
-                        boxShadow: achievement.unlocked ? "0 0 20px rgba(119, 204, 136, 0.4)" : "none",
-                    }}
-                >
-                    {achievement.icon}
+                <Avatar sx={{ bgcolor: achievement.unlocked ? "primary.main" : theme.palette.action.disabledBackground, color: achievement.unlocked ? theme.palette.getContrastText(theme.palette.primary.main) : theme.palette.action.disabled, width: 80, height: 80, mx: "auto", mb: 2, boxShadow: achievement.unlocked ? `0 0 20px ${theme.palette.primary.main}66` : "none", fontSize: '2.5rem' }} >
+                    {mapIconNameToComponent(achievement.iconName)}
                 </Avatar>
-                <Typography variant="h5" fontWeight="bold">
-                    {achievement.title}
-                </Typography>
-                <Chip
-                    label={achievement.rarity}
-                    size="small"
-                    sx={{
-                        bgcolor: getRarityColor(achievement.rarity),
-                        color: "#06070e",
-                        textTransform: "uppercase",
-                        fontSize: "0.6rem",
-                        fontWeight: "bold",
-                        height: 20,
-                        mt: 1,
-                    }}
-                />
+                <Typography variant="h5" fontWeight="bold">{achievement.title}</Typography>
+                <Chip label={achievement.rarity} size="small" sx={{ bgcolor: getRarityColor(achievement.rarity), color: theme.palette.getContrastText(getRarityColor(achievement.rarity)), textTransform: "uppercase", fontSize: "0.6rem", fontWeight: "bold", height: 20, mt: 1, }} />
             </DialogTitle>
-            <DialogContent sx={{ pb: 4 }}>
-                <Typography variant="body1" sx={{ textAlign: "center", mb: 3 }}>
-                    {achievement.description}
-                </Typography>
-
-                <Divider sx={{ my: 2, borderColor: "rgba(119, 204, 136, 0.1)" }} />
-
+            <DialogContent sx={{ pb: 3 }}>
+                <Typography variant="body1" sx={{ textAlign: "center", mb: 3, color: 'text.secondary' }}>{achievement.description}</Typography>
+                <Divider sx={{ my: 2, borderColor: "divider" }} />
                 <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid size={{xs: 6}} >
-                        <Typography variant="caption" color="text.secondary">
-                            Categoria
-                        </Typography>
-                        <Typography variant="body2" fontWeight="medium">
-                            {achievement.category}
-                        </Typography>
-                    </Grid>
-                    <Grid size={{xs: 6}}>
-                        <Typography variant="caption" color="text.secondary">
-                            Pontos XP
-                        </Typography>
-                        <Typography variant="body2" fontWeight="medium">
-                            {achievement.xp} XP
-                        </Typography>
-                    </Grid>
+                    <Grid size={{xs: 6}}> <Typography variant="caption" color="text.secondary">Categoria</Typography> <Typography variant="body2" fontWeight="medium">{achievement.category}</Typography> </Grid>
                 </Grid>
-
-                {achievement.progress !== undefined && (
+                {achievement.current !== undefined && achievement.total !== undefined && achievement.total > 0 && !achievement.unlocked && (
                     <Box sx={{ mt: 2 }}>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary">
-                                Progresso
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                {achievement.current}/{achievement.total}
-                            </Typography>
-                        </Box>
-                        <LinearProgress
-                            variant="determinate"
-                            value={achievement.progress}
-                            sx={{
-                                height: 8,
-                                borderRadius: 1,
-                                bgcolor: "rgba(255, 255, 252, 0.1)",
-                                "& .MuiLinearProgress-bar": {
-                                    bgcolor: achievement.unlocked ? "primary.main" : "rgba(119, 204, 136, 0.5)",
-                                },
-                            }}
-                        />
+                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}><Typography variant="caption" color="text.secondary">Progresso</Typography><Typography variant="caption" color="text.secondary">{achievement.current}/{achievement.total}</Typography></Box>
+                        <LinearProgress variant="determinate" value={Math.min(100, (achievement.current / achievement.total) * 100)} sx={{ height: 8, borderRadius: 1, bgcolor: "action.disabledBackground", "& .MuiLinearProgress-bar": { bgcolor: "primary.light" } }}/>
                     </Box>
                 )}
-
                 {achievement.unlocked ? (
-                    <Box sx={{ textAlign: "center", mt: 3 }}>
-                        <CelebrationIcon sx={{ color: "primary.main", fontSize: 32, mb: 1 }} />
-                        <Typography variant="body2" color="text.secondary">
-                            Você conquistou esta realização em {achievement.date}!
-                        </Typography>
-                    </Box>
+                    <Box sx={{ textAlign: "center", mt: 3 }}> <CelebrationIcon sx={{ color: "primary.main", fontSize: 32, mb: 1 }} /> <Typography variant="body2" color="text.secondary">Você conquistou esta realização em {achievement.date ? formatDate(achievement.date, 'DD/MM/YY') : 'data não registrada'}!</Typography> </Box>
                 ) : (
-                    <Box sx={{ textAlign: "center", mt: 3 }}>
-                        <LockIcon sx={{ color: "rgba(255, 255, 252, 0.3)", fontSize: 32, mb: 1 }} />
-                        <Typography variant="body2" color="text.secondary">
-                            Continue treinando para desbloquear esta conquista!
-                        </Typography>
-                    </Box>
+                    <Box sx={{ textAlign: "center", mt: 3 }}> <LockIcon sx={{ color: "text.disabled", fontSize: 32, mb: 1 }} /> <Typography variant="body2" color="text.secondary">Continue treinando para desbloquear!</Typography> </Box>
                 )}
             </DialogContent>
-            <DialogActions sx={{ p: 3, pt: 0, justifyContent: "center" }}>
-                {achievement.unlocked && (
-                    <Button
-                        variant="outlined"
-                        startIcon={<ShareIcon />}
-                        sx={{
-                            borderColor: "rgba(119, 204, 136, 0.5)",
-                            color: "primary.main",
-                            "&:hover": {
-                                borderColor: "primary.main",
-                                bgcolor: "rgba(119, 204, 136, 0.1)",
-                            },
-                        }}
-                    >
-                        Compartilhar
-                    </Button>
-                )}
-                <Button
-                    variant="contained"
-                    onClick={onClose}
-                    sx={{
-                        bgcolor: "primary.main",
-                        color: "#06070e",
-                        "&:hover": {
-                            bgcolor: "primary.dark",
-                        },
-                    }}
-                >
-                    Fechar
-                </Button>
+            <DialogActions sx={{ p: 2, pt: 0, justifyContent: "center" }}>
+                {achievement.unlocked && ( <Button variant="outlined" startIcon={<ShareIcon />} sx={{ borderColor: "primary.main", color: "primary.main", "&:hover": { borderColor: "primary.dark", bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1) } }} > Compartilhar </Button> )}
+                <Button variant="contained" onClick={onClose} sx={{ "&:hover": { bgcolor: "primary.dark" } }} > Fechar </Button>
             </DialogActions>
         </Dialog>
-    )
-}
+    );
+};
+// --- Fim AchievementDialog ---
 
-// Função para obter a cor com base na raridade
-const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-        case "comum":
-            return "rgba(255, 255, 252, 0.8)"
-        case "raro":
-            return "#77cc88"
-        case "épico":
-            return "#9966ff"
-        case "lendário":
-            return "#ffcc33"
-        default:
-            return "rgba(255, 255, 252, 0.8)"
-    }
-}
 
-// Componente principal da página de conquistas
-const Achievements = () => {
-    const [tabValue, setTabValue] = useState(0)
-    const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null)
-    const [dialogOpen, setDialogOpen] = useState(false)
+// --- Componente Principal da Página ---
+const AchievementsPage: React.FC = () => {
+    const [tabValue, setTabValue] = useState(0);
+    const [selectedAchievement, setSelectedAchievement] = useState<FullAchievement | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
-    const theme = useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-    // Lista de conquistas
-    const achievements: Achievement[] = [
-        {
-            id: 1,
-            title: "Primeiro Passo",
-            description: "Complete seu primeiro treino no aplicativo",
-            icon: <DumbbellIcon />,
-            category: "Iniciante",
-            unlocked: true,
-            date: "10/04/2023",
-            rarity: "comum",
-            xp: 50,
-        },
-        {
-            id: 2,
-            title: "Sequência Iniciante",
-            description: "Complete 7 dias consecutivos de treino",
-            icon: <HotstreakIcon />,
-            category: "Sequência",
-            unlocked: true,
-            progress: 100,
-            total: 7,
-            current: 7,
-            date: "17/04/2023",
-            rarity: "comum",
-            xp: 100,
-        },
-        {
-            id: 3,
-            title: "Sequência Dedicada",
-            description: "Complete 30 dias consecutivos de treino",
-            icon: <FireIcon />,
-            category: "Sequência",
-            unlocked: false,
-            progress: 40,
-            total: 30,
-            current: 12,
-            rarity: "raro",
-            xp: 300,
-        },
-        {
-            id: 4,
-            title: "Maratonista",
-            description: "Acumule 100km de corrida",
-            icon: <RunIcon />,
-            category: "Cardio",
-            unlocked: false,
-            progress: 65,
-            total: 100,
-            current: 65,
-            rarity: "raro",
-            xp: 250,
-        },
-        {
-            id: 5,
-            title: "Mestre do Tempo",
-            description: "Acumule 50 horas de treino",
-            icon: <TimerIcon />,
-            category: "Volume",
-            unlocked: true,
-            progress: 100,
-            total: 50,
-            current: 50,
-            date: "02/05/2023",
-            rarity: "raro",
-            xp: 250,
-        },
-        {
-            id: 6,
-            title: "Queimador de Calorias",
-            description: "Queime 10.000 calorias em treinos",
-            icon: <BoltIcon />,
-            category: "Volume",
-            unlocked: true,
-            progress: 100,
-            total: 10000,
-            current: 10000,
-            date: "15/05/2023",
-            rarity: "raro",
-            xp: 200,
-        },
-        {
-            id: 7,
-            title: "Explorador de Exercícios",
-            description: "Experimente 20 exercícios diferentes",
-            icon: <DumbbellIcon />,
-            category: "Diversidade",
-            unlocked: true,
-            progress: 100,
-            total: 20,
-            current: 20,
-            date: "22/04/2023",
-            rarity: "comum",
-            xp: 150,
-        },
-        {
-            id: 8,
-            title: "Coração de Ferro",
-            description: "Mantenha sua frequência cardíaca na zona alvo por 60 minutos acumulados",
-            icon: <HeartIcon />,
-            category: "Cardio",
-            unlocked: false,
-            progress: 75,
-            total: 60,
-            current: 45,
-            rarity: "raro",
-            xp: 200,
-        },
-        {
-            id: 9,
-            title: "Levantador de Peso",
-            description: "Levante um total acumulado de 10.000kg em exercícios",
-            icon: <DumbbellIcon />,
-            category: "Força",
-            unlocked: false,
-            progress: 82,
-            total: 10000,
-            current: 8200,
-            rarity: "raro",
-            xp: 250,
-        },
-        {
-            id: 10,
-            title: "Desafio Superado",
-            description: "Complete um desafio semanal",
-            icon: <TrophyIcon />,
-            category: "Desafios",
-            unlocked: true,
-            date: "28/04/2023",
-            rarity: "comum",
-            xp: 100,
-        },
-        {
-            id: 11,
-            title: "Mestre dos Desafios",
-            description: "Complete 10 desafios semanais",
-            icon: <StarIcon />,
-            category: "Desafios",
-            unlocked: false,
-            progress: 30,
-            total: 10,
-            current: 3,
-            rarity: "épico",
-            xp: 400,
-        },
-        {
-            id: 12,
-            title: "Sequência Lendária",
-            description: "Complete 100 dias consecutivos de treino",
-            icon: <TrophyIcon />,
-            category: "Sequência",
-            unlocked: false,
-            progress: 12,
-            total: 100,
-            current: 12,
-            rarity: "lendário",
-            xp: 1000,
-        },
-        {
-            id: 13,
-            title: "Atleta Completo",
-            description: "Realize treinos em todas as categorias disponíveis",
-            icon: <StarIcon />,
-            category: "Diversidade",
-            unlocked: false,
-            progress: 60,
-            total: 5,
-            current: 3,
-            rarity: "épico",
-            xp: 350,
-        },
-        {
-            id: 14,
-            title: "Madrugador",
-            description: "Complete 10 treinos antes das 7h da manhã",
-            icon: <CalendarIcon />,
-            category: "Hábitos",
-            unlocked: false,
-            progress: 40,
-            total: 10,
-            current: 4,
-            rarity: "raro",
-            xp: 200,
-        },
-        {
-            id: 15,
-            title: "Consistência Perfeita",
-            description: "Complete todos os treinos planejados por 4 semanas seguidas",
-            icon: <TrophyIcon />,
-            category: "Consistência",
-            unlocked: false,
-            progress: 25,
-            total: 4,
-            current: 1,
-            rarity: "épico",
-            xp: 500,
-        },
-    ]
+    const { data: allAchievements = [], isLoading, isError, error } = useAllAchievementsQuery();
 
-    // Filtrar conquistas com base na aba selecionada
-    const getFilteredAchievements = () => {
+    const getFilteredAchievements = (): FullAchievement[] => {
         switch (tabValue) {
-            case 0: // Todas
-                return achievements
-            case 1: // Desbloqueadas
-                return achievements.filter((a) => a.unlocked)
-            case 2: // Bloqueadas
-                return achievements.filter((a) => !a.unlocked)
-            case 3: // Em progresso
-                return achievements.filter((a) => !a.unlocked && a.progress && a.progress > 0)
-            default:
-                return achievements
+            case 0: return allAchievements;
+            case 1: return allAchievements.filter((a) => a.unlocked);
+            case 2: return allAchievements.filter((a) => !a.unlocked);
+            case 3: return allAchievements.filter((a) => !a.unlocked && a.current != null && a.total != null && a.total > 0 && (a.current / a.total * 100) > 0 && (a.current / a.total * 100) < 100);
+            default: return allAchievements;
         }
-    }
+    };
 
-    // Estatísticas de conquistas
     const stats = {
-        total: achievements.length,
-        unlocked: achievements.filter((a) => a.unlocked).length,
-        xpTotal: achievements.filter((a) => a.unlocked).reduce((sum, a) => sum + a.xp, 0),
-    }
+        total: allAchievements.length,
+        unlocked: allAchievements.filter((a) => a.unlocked).length,
+    };
 
-    // Manipuladores de eventos
-    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-        setTabValue(newValue)
-    }
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => setTabValue(newValue);
+    const handleAchievementSelect = (achievement: FullAchievement) => { setSelectedAchievement(achievement); setDialogOpen(true); };
+    const handleDialogClose = () => setDialogOpen(false);
 
-    const handleAchievementSelect = (achievement: Achievement) => {
-        setSelectedAchievement(achievement)
-        setDialogOpen(true)
+    // --- Renderização com Loading/Error States ---
+    if (isLoading) {
+        return (
+            <Container maxWidth="lg" sx={{ py: 4 }}>
+                <Box sx={{ mb: 6, textAlign: "center" }}><Typography variant="h4" fontWeight="bold">Conquistas</Typography></Box>
+                <Grid container spacing={3} justifyContent="center" sx={{ mt: 2, mb: 4 }}>
+                    {[...Array(3)].map((_, i)=><Grid key={i} size={{xs:12, sm:4, md:3}}><Skeleton variant="rounded" height={120} /></Grid>)}
+                </Grid>
+                <Box sx={{ px: { xs: 0, md: 8 }, mb: 2 }}><Skeleton variant="text" height={40} /></Box>
+                <Box sx={{ mb: 4, borderBottom: 1, borderColor: "divider" }}><Skeleton variant="rectangular" height={48} /></Box>
+                <Grid container spacing={3}>
+                    {[...Array(6)].map((_, i) => ( <Grid size={{xs: 12, sm:6, md:4}} key={i}><Skeleton variant="rounded" height={220} /></Grid> ))}
+                </Grid>
+            </Container>
+        );
     }
+    if (isError) {
+        return <Container maxWidth="lg" sx={{ py: 4 }}><Alert severity="error">Erro ao carregar conquistas: {error instanceof Error ? error.message : 'Erro desconhecido'}</Alert></Container>;
+    }
+    // --- Fim Loading/Error States ---
 
-    const handleDialogClose = () => {
-        setDialogOpen(false)
-    }
+    const filteredAchievements = getFilteredAchievements();
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
             {/* Cabeçalho */}
-            <Box sx={{ mb: 6, textAlign: "center" }}>
-                <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
-                    Conquistas
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                    Acompanhe seu progresso e desbloqueie recompensas
-                </Typography>
-
-                {/* Estatísticas */}
-                <Grid container spacing={3} sx={{ mt: 2, mb: 4 }}>
-                    <Grid size={{xs: 6, md:4}}>
-                        <Card variant="outlined" sx={{ bgcolor: "rgba(119, 204, 136, 0.05)" }}>
-                            <CardContent sx={{ textAlign: "center", py: 3 }}>
-                                <TrophyIcon sx={{ fontSize: 40, color: "primary.main", mb: 1 }} />
-                                <Typography variant="h5" fontWeight="bold">
-                                    {stats.unlocked}/{stats.total}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Conquistas Desbloqueadas
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid size={{xs: 6, md:4}}>
-                        <Card variant="outlined" sx={{ bgcolor: "rgba(119, 204, 136, 0.05)" }}>
-                            <CardContent sx={{ textAlign: "center", py: 3 }}>
-                                <StarIcon sx={{ fontSize: 40, color: "primary.main", mb: 1 }} />
-                                <Typography variant="h5" fontWeight="bold">
-                                    {stats.xpTotal}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    XP Total Ganho
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid size={{xs: 6, md:4}}>
-                        <Card variant="outlined" sx={{ bgcolor: "rgba(119, 204, 136, 0.05)" }}>
-                            <CardContent sx={{ textAlign: "center", py: 3 }}>
-                                <LockIcon sx={{ fontSize: 40, color: "primary.main", mb: 1 }} />
-                                <Typography variant="h5" fontWeight="bold">
-                                    {stats.total - stats.unlocked}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    Conquistas Restantes
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+            <Box sx={{ mb: {xs:3, md:6}, textAlign: "center" }}>
+                <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>Conquistas</Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>Acompanhe seu progresso e desbloqueie recompensas</Typography>
+                {/* Estatísticas Resumidas */}
+                <Grid container spacing={2} justifyContent="center" sx={{ mt: 2, mb: 4 }}> {/* Ajustado spacing */}
+                    <Grid size={{xs:12, sm: 4, md:3}}><Card variant="outlined" sx={{bgcolor:"action.hover", height:'100%'}}><CardContent sx={{textAlign: 'center', py:2}}><TrophyIcon sx={{fontSize:32, color:"primary.main", mb:0.5}}/><Typography variant="h6" fontWeight="bold">{stats.unlocked}/{stats.total}</Typography><Typography variant="caption" color="text.secondary">Desbloqueadas</Typography></CardContent></Card></Grid>
+                    <Grid size={{xs:12, sm: 4, md:3}}><Card variant="outlined" sx={{bgcolor:"action.hover", height:'100%'}}><CardContent sx={{textAlign: 'center', py:2}}><LockIcon sx={{fontSize:32, color:"primary.main", mb:0.5}}/><Typography variant="h6" fontWeight="bold">{stats.total - stats.unlocked}</Typography><Typography variant="caption" color="text.secondary">Restantes</Typography></CardContent></Card></Grid>
                 </Grid>
-
                 {/* Barra de progresso geral */}
-                <Box sx={{ px: { xs: 0, md: 8 }, mb: 2 }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Progresso Geral
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {Math.round((stats.unlocked / stats.total) * 100)}%
-                        </Typography>
+                {stats.total > 0 && (
+                    <Box sx={{ px: { xs: 0, md: 8 }, mb: 4 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}><Typography variant="body2" color="text.secondary">Progresso Geral</Typography><Typography variant="body2" color="text.secondary">{Math.round((stats.unlocked / stats.total) * 100)}%</Typography></Box>
+                        <LinearProgress variant="determinate" value={(stats.unlocked / stats.total) * 100} sx={{ height: 8, borderRadius: 1, bgcolor: "action.hover" }}/>
                     </Box>
-                    <LinearProgress
-                        variant="determinate"
-                        value={(stats.unlocked / stats.total) * 100}
-                        sx={{
-                            height: 8,
-                            borderRadius: 1,
-                            bgcolor: "rgba(255, 255, 252, 0.1)",
-                        }}
-                    />
-                </Box>
+                )}
             </Box>
 
-            {/* Filtros */}
-            <Box sx={{ mb: 4, borderBottom: 1, borderColor: "rgba(119, 204, 136, 0.1)" }}>
-                <Tabs
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    variant={isMobile ? "scrollable" : "fullWidth"}
-                    scrollButtons={isMobile ? "auto" : false}
-                    sx={{
-                        "& .MuiTab-root": {
-                            color: "text.secondary",
-                            "&.Mui-selected": {
-                                color: "primary.main",
-                            },
-                        },
-                        "& .MuiTabs-indicator": {
-                            backgroundColor: "primary.main",
-                        },
-                    }}
-                >
-                    <Tab label="Todas" />
-                    <Tab label="Desbloqueadas" />
-                    <Tab label="Bloqueadas" />
-                    <Tab label="Em Progresso" />
+            {/* Filtros (Tabs) */}
+            <Box sx={{ mb: 4, borderBottom: 1, borderColor: "divider" }}>
+                <Tabs value={tabValue} onChange={handleTabChange} variant={isMobile ? "scrollable" : "fullWidth"} scrollButtons="auto" allowScrollButtonsMobile centered={!isMobile}>
+                    <Tab label="Todas" {...a11yProps(0)} />
+                    <Tab label="Desbloqueadas" {...a11yProps(1)} />
+                    <Tab label="Bloqueadas" {...a11yProps(2)} />
+                    <Tab label="Em Progresso" {...a11yProps(3)} />
                 </Tabs>
             </Box>
 
-            {/* Grade de conquistas */}
-            <Grid container spacing={3}>
-                {getFilteredAchievements().map((achievement) => (
-                    <Grid size={{xs: 12, md:4, sm:6}} key={achievement.id}>
-                        <AchievementCard achievement={achievement} onSelect={handleAchievementSelect} />
-                    </Grid>
-                ))}
-            </Grid>
+            {/* --- CONTEÚDO DAS ABAS USANDO TabPanel --- */}
+            {/* Como getFilteredAchievements já muda o conteúdo, podemos ter uma estrutura
+                de TabPanel para cada aba, mas renderizando o mesmo bloco de Grid,
+                ou simplificar sabendo que a lógica de filtro já faz o trabalho.
+                Para seguir o padrão MUI de acessibilidade e estrutura de Tabs,
+                é bom ter os TabPanels. */}
 
-            {/* Diálogo de detalhes */}
+            <TabPanel value={tabValue} index={0}>
+                <Grid container spacing={3}>
+                    {filteredAchievements.length === 0 && !isLoading ? (
+                        <Grid size={12}><Typography sx={{textAlign: 'center', p:3, fontStyle: 'italic'}}>Nenhuma conquista encontrada para este filtro.</Typography></Grid>
+                    ) : (
+                        filteredAchievements.map((achievement) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={achievement.id}>
+                                <AchievementCard achievement={achievement} onSelect={handleAchievementSelect} />
+                            </Grid>
+                        ))
+                    )}
+                </Grid>
+            </TabPanel>
+            <TabPanel value={tabValue} index={1}>
+                {/* O conteúdo é o mesmo porque filteredAchievements já se baseia em tabValue */}
+                <Grid container spacing={3}>
+                    {filteredAchievements.length === 0 && !isLoading ? (
+                        <Grid size={12}><Typography sx={{textAlign: 'center', p:3, fontStyle: 'italic'}}>Nenhuma conquista desbloqueada.</Typography></Grid>
+                    ) : (
+                        filteredAchievements.map((achievement) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={achievement.id}>
+                                <AchievementCard achievement={achievement} onSelect={handleAchievementSelect} />
+                            </Grid>
+                        ))
+                    )}
+                </Grid>
+            </TabPanel>
+            <TabPanel value={tabValue} index={2}>
+                <Grid container spacing={3}>
+                    {filteredAchievements.length === 0 && !isLoading ? (
+                        <Grid size={12}><Typography sx={{textAlign: 'center', p:3, fontStyle: 'italic'}}>Nenhuma conquista bloqueada (Parabéns!).</Typography></Grid>
+                    ) : (
+                        filteredAchievements.map((achievement) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={achievement.id}>
+                                <AchievementCard achievement={achievement} onSelect={handleAchievementSelect} />
+                            </Grid>
+                        ))
+                    )}
+                </Grid>
+            </TabPanel>
+            <TabPanel value={tabValue} index={3}>
+                <Grid container spacing={3}>
+                    {filteredAchievements.length === 0 && !isLoading ? (
+                        <Grid size={12}><Typography sx={{textAlign: 'center', p:3, fontStyle: 'italic'}}>Nenhuma conquista em progresso.</Typography></Grid>
+                    ) : (
+                        filteredAchievements.map((achievement) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={achievement.id}>
+                                <AchievementCard achievement={achievement} onSelect={handleAchievementSelect} />
+                            </Grid>
+                        ))
+                    )}
+                </Grid>
+            </TabPanel>
+
             <AchievementDialog open={dialogOpen} achievement={selectedAchievement} onClose={handleDialogClose} />
         </Container>
-    )
-}
+    );
+};
 
-export default Achievements
+export default AchievementsPage;

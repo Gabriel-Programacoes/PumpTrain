@@ -15,6 +15,7 @@ import { styled } from "@mui/material/styles";
 import { useUserProfileQuery } from '../../hooks/useUserProfileQuery';
 import { useUpdateUserProfileMutation } from '../../hooks/useUpdateUserProfileMutation';
 import { User } from '../../types/user';
+import {parseNumericInput} from "../../utils/formUtils.ts";
 
 // Componentes/Funções Auxiliares
 interface TabPanelProps { children?: React.ReactNode; index: number; value: number; }
@@ -22,7 +23,6 @@ function TabPanel(props: TabPanelProps) { const { children, value, index, ...oth
 function a11yProps(index: number) { return { id: `profile-tab-${index}`, "aria-controls": `profile-tabpanel-${index}` }; }
 const StatCard = styled(Card)(({ theme }) => ({ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: theme.spacing(2), backgroundColor: "rgba(119, 204, 136, 0.05)", border: "1px solid rgba(119, 204, 136, 0.1)", }));
 const getInitials = (name: string = ""): string => name.split(' ').map(word => word[0]).slice(0, 2).join('').toUpperCase();
-// --- Fim Placeholders ---
 
 // Tipo para os dados do formulário
 type ProfileFormData = {
@@ -31,16 +31,6 @@ type ProfileFormData = {
     age: string;
     height: string;
     weight: string;
-};
-
-// Função auxiliar para conversão
-const parseNumericInput = (value: string | number | null | undefined, allowFloat = false): number | null => {
-    if (value === null || value === undefined || typeof value === 'number') {
-        return typeof value === 'number' && !isNaN(value) ? value : null;
-    }
-    if (value.trim() === '') { return null; }
-    const number = allowFloat ? parseFloat(value) : parseInt(value, 10);
-    return isNaN(number) ? null : number;
 };
 
 const ProfilePage: React.FC = () => {
@@ -102,10 +92,8 @@ const ProfilePage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary"> Gerencie suas informações pessoais e acompanhe seu progresso </Typography>
             </Box>
 
-            {/* Seção Principal */}
             <Grid container spacing={3}>
                 {/* Coluna Esquerda */}
-                {/* <<< Grid V2 >>> */}
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Card variant="outlined" sx={{ mb: 3 }}>
                         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", p: 3 }}>
@@ -121,7 +109,6 @@ const ProfilePage: React.FC = () => {
                     </Card>
                     <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}> Estatísticas </Typography>
                     <Grid container spacing={2}>
-                        {/* <<< Grid V2 >>> */}
                         <Grid size={6}> <StatCard> {/* ... Treinos ... */} </StatCard> </Grid>
                         <Grid size={6}> <StatCard> {/* ... Calorias ... */} </StatCard> </Grid>
                         <Grid size={6}> <StatCard> {/* ... Horas ... */} </StatCard> </Grid>

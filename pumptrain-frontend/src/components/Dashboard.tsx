@@ -1,51 +1,23 @@
-// Ex: src/pages/DashboardPage/DashboardPage.tsx ou MyWorkoutsPage.tsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
     Box, Typography, Card, CardContent, CardHeader, LinearProgress,
-    Avatar, Stack, Button, Container, Skeleton, Alert
+    Avatar, Stack, Button, Container, Skeleton, Alert, CardActionArea
 } from "@mui/material";
 import {
-    LocalFireDepartment as FireIcon, EmojiEvents as TrophyIcon,
-    FitnessCenter as DumbbellIcon, CalendarToday as CalendarIcon,
-    ChevronRight as ChevronRightIcon, Star as StarIcon
+    LocalFireDepartment as FireIcon, ChevronRight as ChevronRightIcon
 } from "@mui/icons-material";
 import Grid from '@mui/material/Grid';
 
 
 // Hooks e Tipos
-// useWorkoutsQuery não é mais necessário aqui para a lista principal
 import { useUserStatsQuery } from '../hooks/useUserStatsQuery';
 import { useAchievementsQuery } from '../hooks/useAchievementsQuery';
 import { useTodaysWorkoutQuery } from '../hooks/useTodaysWorkoutQuery';
-// Importar componente do Treino do Dia (Verifique o caminho)
 import { TodaysWorkoutCard } from './TodaysWorkoutCard';
-// Tipos são usados pelos hooks, não precisam ser importados aqui geralmente
 
-
-// Função para formatar tempo (Mova para src/utils/ se preferir)
-const formatTimeMinutes = (totalMinutes: number | undefined | null): string => {
-    if (totalMinutes == null || totalMinutes === 0) return "0m";
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    let result = "";
-    if (hours > 0) result += `${hours}h `;
-    if (minutes > 0 || hours === 0) result += `${minutes}m`;
-    return result.trim();
-};
-
-// Função para mapear ícones (Mova para src/utils/ se preferir)
-const mapIconNameToComponent = (iconName?: string): React.ReactNode => {
-    switch (iconName) {
-        case 'LocalFireDepartment': return <FireIcon fontSize='small' sx={{color: 'background.default'}} />;
-        case 'FitnessCenter': return <DumbbellIcon fontSize='small' sx={{color: 'background.default'}} />;
-        case 'Star': return <StarIcon fontSize='small' sx={{color: 'background.default'}} />;
-        case 'Trophy': return <TrophyIcon fontSize='small' sx={{color: 'background.default'}} />;
-        case 'CalendarMonth': return <CalendarIcon fontSize='small' sx={{color: 'background.default'}} />;
-        // Adicione mais casos
-        default: return <StarIcon fontSize='small' sx={{color: 'background.default'}} />;
-    }
-};
+import { formatTimeMinutes } from '../utils/formatters'; // Ajuste o caminho
+import { mapIconNameToComponent } from '../utils/uiHelpers';    // Ajuste o caminho
 
 // --- Componente Dashboard Principal ---
 const Dashboard: React.FC = () => {
@@ -57,7 +29,7 @@ const Dashboard: React.FC = () => {
     const { data: todaysWorkout, isLoading: isLoadingToday, isError: isErrorToday } = useTodaysWorkoutQuery();
 
     // Handler de navegação
-    const navigateToWorkoutsList = () => navigate('/workouts'); // Rota da lista completa
+    const navigateToWorkoutsList = () => navigate('/workouts');
     const navigateToCreateWorkout = () => navigate('/workouts/new');
 
     // Estado de erro combinado para o Stats Grid
@@ -106,11 +78,15 @@ const Dashboard: React.FC = () => {
                     </Grid>
                 </CardContent>
             </Card>
+
+
+
             {hasStatOrAchievementError && ( <Alert severity="warning" sx={{ mb: 3 }}>Falha ao carregar algumas estatísticas.</Alert> )}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 {/* Card Calorias */}
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <Card variant="outlined" sx={{ height: '100%' }}>
+                        {/* Card Calorias */}
                         <CardHeader title="Calorias Queimadas" slotProps={{title: {
                                 variant: "subtitle1",
                                 fontWeight: 'medium'
@@ -127,6 +103,7 @@ const Dashboard: React.FC = () => {
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <Card variant="outlined" sx={{ height: '100%' }}>
+                        {/* Card Tempo de Treino*/}
                         <CardHeader title="Tempo de Treino" slotProps={{title: {
                                 variant: "subtitle1",
                                 fontWeight: 'medium'
@@ -140,26 +117,35 @@ const Dashboard: React.FC = () => {
                     </Card>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 12, md: 4 }}>
-                    <Card variant="outlined" sx={{ height: '100%' }}>
-                        <CardHeader title="Conquistas" slotProps={{ title: {variant: "subtitle1", fontWeight: 'medium'} }} />
-                        <CardContent>
-                            {isLoadingAchievements ? <Skeleton height={40} width="60%" /> :
-                                <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
-                                    <Typography variant="h4" fontWeight="bold" color="primary"> {achievementsData?.unlockedCount ?? 0} </Typography>
-                                    <Typography variant="body1" color="text.secondary"> de {achievementsData?.totalCount ?? 0} </Typography>
-                                </Box>
-                            }
-                            <Stack direction="row" spacing={1} sx={{ mt: 1, minHeight: 32 }}>
-                                {isLoadingAchievements ? <> <Skeleton variant="circular" width={32} height={32} /> <Skeleton variant="circular" width={32} height={32} /> </> :
-                                    achievementsData?.recent?.slice(0, 3).map((ach) => (
-                                        <Avatar key={ach.id} title={ach.name} sx={{ width: 32, height: 32, bgcolor: "primary.light" }}>
-                                            {mapIconNameToComponent(ach.iconName)}
-                                        </Avatar>
-                                    ))
+                    <CardActionArea
+                        component={RouterLink}
+                        to="/achievements/all"
+                        sx={{ height: '100%', display: 'block', textDecoration: 'none', borderRadius: 1 }}
+                    >
+                        <Card variant="outlined" sx={{ height: '100%' }}>
+                            <CardHeader title="Conquistas" slotProps={{title: {
+                                    variant: "subtitle1",
+                                    fontWeight: 'medium'
+                                } }} />
+                            <CardContent>
+                                {isLoadingAchievements ? <Skeleton height={40} width="60%" /> :
+                                    <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
+                                        <Typography variant="h4" fontWeight="bold" color="primary"> {achievementsData?.unlockedCount ?? 0} </Typography>
+                                        <Typography variant="body1" color="text.secondary"> de {achievementsData?.totalCount ?? 0} </Typography>
+                                    </Box>
                                 }
-                            </Stack>
-                        </CardContent>
-                    </Card>
+                                <Stack direction="row" spacing={1} sx={{ mt: 1, minHeight: 32 }}>
+                                    {isLoadingAchievements ? <> <Skeleton variant="circular" width={32} height={32} /> <Skeleton variant="circular" width={32} height={32} /> </> :
+                                        achievementsData?.recent?.slice(0, 3).map((ach) => (
+                                            <Avatar key={ach.id} title={ach.name} sx={{ width: 32, height: 32, bgcolor: "primary.light" }}>
+                                                {mapIconNameToComponent(ach.iconName)}
+                                            </Avatar>
+                                        ))
+                                    }
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </CardActionArea>
                 </Grid>
             </Grid>
 

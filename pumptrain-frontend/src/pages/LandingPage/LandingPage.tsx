@@ -129,7 +129,7 @@ const LandingPage: React.FC = () => {
             {/* Features Section */}
             <Box id="features-section" sx={{ py: { xs: 6, md: 10 } }}>
                 <Container maxWidth="lg">
-                    {/* ... (Conteúdo da Seção Features com FeatureCard) ... */}
+                    {/* (Conteúdo da Seção Features com FeatureCard) */}
                     <Box sx={{ textAlign: "center", mb: 8 }}>
                         <Typography variant="overline" sx={{ color: "primary.main", letterSpacing: 2, fontWeight: 600 }}>
                             RECURSOS
@@ -137,23 +137,34 @@ const LandingPage: React.FC = () => {
                         <Typography variant="h3" component="h2" sx={{ fontWeight: 700, mb: 2 }}>
                             Tudo que você precisa para alcançar seus objetivos
                         </Typography>
-                        {/* ... (resto do texto) ... */}
                     </Box>
                     <Grid container spacing={4}>
-                        {/* ... (Grid items com FeatureCard) ... */}
-                        <Grid size={{xs: 12, md: 4}}> <FeatureCard icon={<LocalFireDepartmentIcon />} title="Acompanhamento de Sequência" description="..." /> </Grid>
-                        <Grid size={{xs: 12, md: 4}}> <FeatureCard icon={<BarChartIcon />} title="Análise de Progresso" description="..." /> </Grid>
-                        <Grid size={{xs: 12, md: 4}}> <FeatureCard icon={<EmojiEventsIcon />} title="Sistema de Conquistas" description="..." /> </Grid>
+                        {/* (Grid items com FeatureCard) */}
+                        <Grid size={{xs: 12, md: 4}}> <FeatureCard
+                            icon={<LocalFireDepartmentIcon />}
+                            title="Acompanhamento de Sequência"
+                            description="Mantenha sua motivação em alta registrando seus dias de treino consecutivos. Desafie-se a construir a maior sequência possível e veja seus recordes!" />
+                        </Grid>
+                        <Grid size={{xs: 12, md: 4}}> <FeatureCard
+                            icon={<BarChartIcon />}
+                            title="Análise de Progresso"
+                            description="Visualize sua evolução de forma clara! Acompanhe seu desempenho, peso, repetições e outras métricas." />
+                        </Grid>
+                        <Grid size={{xs: 12, md: 4}}> <FeatureCard
+                            icon={<EmojiEventsIcon />}
+                            title="Sistema de Conquistas"
+                            description="Desbloqueie medalhas e recompensas virtuais à medida que atinge seus objetivos e supera desafios. Cada conquista é um passo em direção à sua melhor versão!" />
+                        </Grid>
                     </Grid>
                 </Container>
             </Box>
 
             {/* How It Works Section */}
-            <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: theme.palette.action.hover }}> {/* Usar cor do tema */}
+            <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: theme.palette.action.hover }}>
                 <Container maxWidth="lg">
                     {/* ... (Conteúdo da Seção How It Works) ... */}
                     <Box sx={{ textAlign: "center", mb: 8 }}>
-                        {/* ... Títulos ... */}
+                        {/* Títulos */}
                     </Box>
                     <Grid container spacing={6} alignItems="center">
                         <Grid size={{xs: 12, md: 6}}>
@@ -169,11 +180,29 @@ const LandingPage: React.FC = () => {
             <Box sx={{ py: { xs: 6, md: 10 } }}>
                 <Container maxWidth="lg">
                     {/* ... (Conteúdo da Seção Testimonials com TestimonialCard) ... */}
-                    <Box sx={{ textAlign: "center", mb: 8 }}>{/* ... Títulos ... */}</Box>
+                    <Box sx={{ textAlign: "center", mb: 8 }}></Box>
                     <Grid container spacing={4}>
-                        <Grid size={{xs: 12, md: 4}}> <TestimonialCard name="Carlos Silva" role="..." image="/images/user1.jpg" quote="..." /> </Grid>
-                        <Grid size={{xs: 12, md: 4}}> <TestimonialCard name="Ana Oliveira" role="..." image="/images/user2.jpg" quote="..." /> </Grid>
-                        <Grid size={{xs: 12, md: 4}}> <TestimonialCard name="Pedro Santos" role="..." image="/images/user3.jpg" quote="..." /> </Grid>
+                        <Grid size={{xs: 12, md: 4}}>
+                            <TestimonialCard
+                                name="Carlos Silva"
+                                role="Treina há 8 meses"
+                                image="/images/user1.jpg"
+                                quote="O PumpTrain mudou completamente minha forma de treinar. Consegui ganhar 5kg de massa muscular em apenas 3 meses!" />
+                        </Grid>
+                        <Grid size={{xs: 12, md: 4}}>
+                            <TestimonialCard
+                                name="Ana Oliveira"
+                                role="Treina há 1 ano"
+                                image="/images/user2.jpg"
+                                quote="A função de sequência de treinos me mantém motivada. Já estou há 45 dias sem faltar um treino!" />
+                        </Grid>
+                        <Grid size={{xs: 12, md: 4}}>
+                            <TestimonialCard
+                                name="Pedro Santos"
+                                role="Treina há 6 meses"
+                                image="/images/user3.jpg"
+                                quote="Os gráficos de progresso são incríveis. Finalmente consigo ver minha evolução de forma clara e objetiva." />
+                        </Grid>
                     </Grid>
                 </Container>
             </Box>
@@ -181,31 +210,36 @@ const LandingPage: React.FC = () => {
             {/* FAQ Section */}
             <Box sx={{ py: { xs: 6, md: 10 } }}>
                 <Container maxWidth="lg">
-                    {/* ... (Conteúdo da Seção FAQ com FaqAccordion) ... */}
-                    <Box sx={{ textAlign: "center", mb: 8 }}>{/* ... Títulos ... */}</Box>
+                    <Box sx={{ textAlign: "center", mb: 8 }}></Box>
                     <Grid container spacing={2} justifyContent="center">
                         <Grid size={{xs: 12, md: 8}}>
-                            {/* Passar as perguntas/respostas reais */}
-                            <FaqAccordion faqs={[ { question: "Q1?", answer: "A1" }, /* ... */ ]} />
+                            <FaqAccordion faqs={[ {
+                                question: "Como o PumpTrain me ajuda a atingir meus objetivos de treino?",
+                                answer: "O PumpTrain oferece registro detalhado de treinos, acompanhamento de progresso com estatísticas visuais," +
+                                    " e funcionalidades como sequências de treino e um sistema de conquistas para manter você engajado e motivado em sua jornada fitness." }, ]} />
+                            <FaqAccordion faqs={[ {
+                                question: "Posso criar meus próprios treinos personalizados na plataforma??",
+                                answer: "A1" },  ]} />
+                            <FaqAccordion faqs={[ {
+                                question: "A plataforma PumpTrain é gratuita??",
+                                answer: "Sim! O PumpTrain está focado em oferecer uma experiência completa e é 100% gratuito para todos os usuários." },  ]} />
+                            <FaqAccordion faqs={[ {
+                                question: "Como funciona o sistema de \"sequência de treinos\"??",
+                                answer: "Cada treino que você marca como concluído no dia planejado (ou no dia em que ele foi efetivamente realizado e marcado) contribui para sua sequência de treinos." +
+                                    " Manter uma sequência longa é uma ótima forma de construir hábitos consistentes e se manter motivado!" },  ]} />
                         </Grid>
                     </Grid>
                 </Container>
             </Box>
-
-            {/* CTA Section */}
-            <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: theme.palette.action.hover }}> {/* Usar cor do tema */}
+            <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: theme.palette.action.hover }}>
                 <Container maxWidth="md">
-                    {/* ... (Conteúdo da Seção CTA) ... */}
                     <Box sx={{ textAlign: "center", p: { xs: 3, sm: 6 }, borderRadius: 4, border: `1px solid ${theme.palette.divider}` }}>
-                        {/* ... Icon, Typography ... */}
-                        <Button variant="contained" size="large" onClick={handleStartNow} /* <<< Conectado */ sx={{ /* ... */ }}>
-                            Começar Agora — É Grátis
+                        <Button variant="contained" size="large" onClick={handleStartNow}>
+                            Comece Agora — É Grátis
                         </Button>
                     </Box>
                 </Container>
             </Box>
-
-            {/* Rodapé */}
             <LandingFooter />
         </Box>
     );
