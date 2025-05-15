@@ -40,18 +40,18 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
      * @param endDate A data de fim do intervalo
      * @return O número de sessões de treino no intervalo
      */
-    int countByUserAndSessionDateBetween(User user, LocalDate startDate, LocalDate endDate);
 
     /**
-     * Busca os timestamps distintos de conclusão (completedAt) para as sessões de um usuário
-     * que foram marcadas como concluídas, ordenados do mais recente para o mais antigo.
-     * Usado principalmente para cálculo de streaks baseado na data de conclusão.
+     * Conta o número de sessões de treino concluídas por um usuário dentro de um intervalo de timestamps.
+     * Usado para calcular treinos concluídos no mês atual para conquistas como "PERFECT_MONTH".
      *
      * @param user O usuário.
-     * @return Uma lista de LocalDateTime representando os timestamps de conclusão únicos e ordenados.
+     * @param startDateTime O timestamp de início do intervalo (inclusivo).
+     * @param endDateTime O timestamp de fim do intervalo (inclusivo).
+     * @return O número de sessões de treino concluídas no intervalo.
      */
-    @Query("SELECT ws.completedAt FROM WorkoutSession ws WHERE ws.user = :user AND ws.completedAt IS NOT NULL ORDER BY ws.completedAt DESC")
-    List<LocalDateTime> findCompletedAtTimestampsByUserOrderByCompletedAtDesc(@Param("user") User user);
+    @Query("SELECT COUNT(ws) FROM WorkoutSession ws WHERE ws.user = :user AND ws.completedAt IS NOT NULL AND ws.completedAt >= :startDateTime AND ws.completedAt <= :endDateTime")
+    int countByUserAndCompletedAtBetween(@Param("user") User user, @Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
 
     /**
      * Busca sessões de treino para um usuário em uma data específica que ainda não foram concluídas
