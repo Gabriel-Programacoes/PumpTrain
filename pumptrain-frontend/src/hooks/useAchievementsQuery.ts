@@ -9,7 +9,7 @@ const fetchAchievements = async (): Promise<AchievementData> => {
     const { data } = await apiClient.get<AchievementData>('/api/user/achievements');
     return {
         unlockedCount: data.unlockedCount ?? 0,
-        totalCount: data.totalCount ?? 0,
+        totalAvailable: data.totalAvailable ?? 0,
         recent: data.recent ?? [],
     };
 };

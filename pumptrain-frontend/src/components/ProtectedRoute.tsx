@@ -2,8 +2,8 @@ import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function ProtectedRoute() {
-    const { isAuthenticated } = useAuth(); // Pega a função de verificação do contexto
-    const location = useLocation(); // Pega a localização atual para redirecionar de volta
+    const { isAuthenticated } = useAuth();
+    const location = useLocation();
 
     if (!isAuthenticated()) {
         // Se não está autenticado, redireciona para /login

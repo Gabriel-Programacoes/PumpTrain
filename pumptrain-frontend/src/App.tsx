@@ -21,7 +21,6 @@ import WorkoutDetailPage from './pages/WorkoutDetailPage/WorkoutDetailPage';
 import EditWorkoutPage from './pages/EditWorkoutPage/EditWorkoutPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import AchievementsPage from './pages/AchievementsPage/AchievementsPage';
-// import HomePage from "./pages/HomePage/HomePage.tsx";
 
 
 import Layout from './components/Layout';

@@ -6,7 +6,7 @@ export interface Achievement {
 
 export interface AchievementData {
     unlockedCount: number;
-    totalCount: number;
+    totalAvailable: number;
     recent?: Achievement[]; // Lista das últimas conquistas desbloqueadas, por exemplo
 }
 

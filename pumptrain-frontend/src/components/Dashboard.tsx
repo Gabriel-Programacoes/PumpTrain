@@ -17,7 +17,7 @@ import { useTodaysWorkoutQuery } from '../hooks/useTodaysWorkoutQuery';
 import { TodaysWorkoutCard } from './TodaysWorkoutCard';
 
 import { formatTimeMinutes } from '../utils/formatters'; // Ajuste o caminho
-import { mapIconNameToComponent } from '../utils/uiHelpers';    // Ajuste o caminho
+import { mapIconNameToComponent } from '../utils/uiHelpers';
 
 // --- Componente Dashboard Principal ---
 const Dashboard: React.FC = () => {
@@ -131,7 +131,7 @@ const Dashboard: React.FC = () => {
                                 {isLoadingAchievements ? <Skeleton height={40} width="60%" /> :
                                     <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
                                         <Typography variant="h4" fontWeight="bold" color="primary"> {achievementsData?.unlockedCount ?? 0} </Typography>
-                                        <Typography variant="body1" color="text.secondary"> de {achievementsData?.totalCount ?? 0} </Typography>
+                                        <Typography variant="body1" color="text.secondary"> de {achievementsData?.totalAvailable ?? 0} </Typography>
                                     </Box>
                                 }
                                 <Stack direction="row" spacing={1} sx={{ mt: 1, minHeight: 32 }}>
