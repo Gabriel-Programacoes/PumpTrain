@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+
 // Imports MUI e Icons
 import {
     Box, Typography, Grid, Card, CardContent, Avatar, Button,
@@ -9,7 +10,6 @@ import {
 import {
     Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon
 } from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
 
 // Hooks e Tipos
 import { useUserProfileQuery } from '../../hooks/useUserProfileQuery';
@@ -21,7 +21,6 @@ import {parseNumericInput} from "../../utils/formUtils.ts";
 interface TabPanelProps { children?: React.ReactNode; index: number; value: number; }
 function TabPanel(props: TabPanelProps) { const { children, value, index, ...other } = props; return (<div role="tabpanel" hidden={value !== index} {...other}>{value === index && <Box sx={{ py: 3 }}>{children}</Box>}</div>); }
 function a11yProps(index: number) { return { id: `profile-tab-${index}`, "aria-controls": `profile-tabpanel-${index}` }; }
-const StatCard = styled(Card)(({ theme }) => ({ height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: theme.spacing(2), backgroundColor: "rgba(119, 204, 136, 0.05)", border: "1px solid rgba(119, 204, 136, 0.1)", }));
 const getInitials = (name: string = ""): string => name.split(' ').map(word => word[0]).slice(0, 2).join('').toUpperCase();
 
 // Tipo para os dados do formulário
@@ -107,13 +106,6 @@ const ProfilePage: React.FC = () => {
                             </Button>
                         </CardContent>
                     </Card>
-                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}> Estatísticas </Typography>
-                    <Grid container spacing={2}>
-                        <Grid size={6}> <StatCard> {/* ... Treinos ... */} </StatCard> </Grid>
-                        <Grid size={6}> <StatCard> {/* ... Calorias ... */} </StatCard> </Grid>
-                        <Grid size={6}> <StatCard> {/* ... Horas ... */} </StatCard> </Grid>
-                        <Grid size={6}> <StatCard> {/* ... Conquistas ... */} </StatCard> </Grid>
-                    </Grid>
                 </Grid>
 
                 {/* Coluna Direita */}

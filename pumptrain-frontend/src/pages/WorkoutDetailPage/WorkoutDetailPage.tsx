@@ -63,7 +63,7 @@ const formatDate = (
 const WorkoutDetailPage: React.FC = () => {
     const { workoutId } = useParams<{ workoutId: string }>();
     const navigate = useNavigate();
-    // const { showSnackbar } = useSnackbar(); // Usar apenas se necessário (ex: botão editar)
+    // const { showSnackbar } = useSnackbar(); Usar apenas se necessário (ex: botão editar)
     const { data: workout, isLoading, isError, error } = useWorkoutDetailQuery(workoutId);
     const deleteMutation = useDeleteWorkoutMutation();
     const completeWorkoutMutation = useCompleteWorkoutMutation();
@@ -198,7 +198,7 @@ const WorkoutDetailPage: React.FC = () => {
                 )}
             </Paper>
 
-            {/* 3. Lista de Atividades (CORRIGIDO) */}
+            {/* 3. Lista de Atividades */}
             <Typography variant="h5" component="h2" gutterBottom sx={{ mt: 3 }}> Exercícios do Treino </Typography>
             {workout.activities && workout.activities.length > 0 ? (
                 <List disablePadding>
@@ -207,7 +207,7 @@ const WorkoutDetailPage: React.FC = () => {
                             <Typography variant="h6" component="div" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
                                 <FitnessCenterIcon sx={{ mr: 1, color: 'primary.main' }} />
                                 {/* Exibe ID do exercício. Implementar busca de nome será uma melhoria futura. */}
-                                {`Exercício ID: ${activity.exerciseId}`}
+                                {` ${activity.exerciseName}`}
                             </Typography>
                             <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap" sx={{ mb: activity.notes ? 1 : 0, alignItems: 'center' }}>
                                 {/* Usando ícones padrão (RepeatIcon, MonitorWeightIcon) */}

@@ -6,7 +6,7 @@ interface ApiErrorResponse {
     error?: string;
     message?: string;
     path?: string;
-    fieldErrors?: string[];
+    fieldErrors?: Array<{ field: string; message: string }>;
 }
 
 const apiClient = axios.create({

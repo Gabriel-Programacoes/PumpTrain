@@ -4,9 +4,9 @@ import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../api/apiClient';
 import { AxiosError } from 'axios';
 
-// MUI Imports (combinados de ambos os exemplos)
+// MUI Imports
 import {
-    Box, Container, Typography, TextField, Button, Grid, Link, Checkbox, FormControlLabel,
+    Box, Container, Typography, TextField, Button, Grid, Link,
     Divider, Paper, IconButton, InputAdornment, useMediaQuery, useTheme, Alert,
     CircularProgress, FormLabel, FormControl,
 } from "@mui/material";
@@ -25,7 +25,7 @@ const LoginContainer = styled(Box)(({ theme }) => ({
     display: "flex",
     position: "relative",
     overflow: "hidden",
-    backgroundColor: theme.palette.background.default, // Adicionar cor de fundo base
+    backgroundColor: theme.palette.background.default,
     "&::before": {
         content: '""',
         position: "absolute",
@@ -33,14 +33,13 @@ const LoginContainer = styled(Box)(({ theme }) => ({
         right: 0,
         width: "50%",
         height: "100%",
-        // Usar cores do tema para o gradiente
         background: theme.palette.mode === 'dark'
             ? `radial-gradient(circle, hsla(135, 50%, 55%, 0.08) 0%, hsla(0, 0%, 0%, 0) 70%)`
             : `radial-gradient(circle, hsla(135, 50%, 55%, 0.1) 0%, hsla(0, 0%, 100%, 0) 70%)`,
         zIndex: 0,
         [theme.breakpoints.down("md")]: {
             width: "100%",
-            opacity: 0.5, // Suavizar no mobile
+            opacity: 0.5,
         },
     },
 }));
@@ -56,7 +55,7 @@ const SocialButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-// --- Componente Principal Combinado ---
+// --- Componente Principal ---
 
 const LoginPage: React.FC = () => {
     const theme = useTheme();
@@ -64,17 +63,16 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    // Estados combinados
+    // Estados
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
-    const [rememberMe, setRememberMe] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Funções combinadas
+    // Funções
     const handleTogglePassword = () => {
         setShowPassword(!showPassword);
     };
@@ -118,11 +116,9 @@ const LoginPage: React.FC = () => {
 
             if (receivedToken) {
                 console.log(`[LoginPage] Login API OK. Token recebido.`);
-                // TODO: Implementar lógica "Lembrar-me" se 'rememberMe' for true
-                // (ex: usar armazenamento diferente ou flag no AuthContext)
-                console.log("Lembrar-me selecionado:", rememberMe);
 
-                login(receivedToken); // Passa token para o contexto
+
+                login(receivedToken);
 
                 console.log(`[LoginPage] Redirecionando para /dashboard...`);
                 navigate('/dashboard'); // Navega após sucesso
@@ -166,7 +162,7 @@ const LoginPage: React.FC = () => {
     // --- JSX ---
     return (
         <LoginContainer>
-            <Container maxWidth="lg" sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: '100vh' }}> {/* Garantir altura */}
+            <Container maxWidth="lg" sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: '100vh' }}>
                 <Grid container spacing={4} alignItems="center" justifyContent="center">
                     {/* Coluna da esquerda - Visível apenas em telas maiores */}
                     {!isMobile && (
@@ -199,7 +195,7 @@ const LoginPage: React.FC = () => {
                                 </Typography>
                                 <Box
                                     component="img"
-                                    src="https://via.placeholder.com/400x300?text=Fitness+Illustration" // Placeholder
+                                    src="https://via.placeholder.com/400x300?text=Fitness+Illustration"
                                     alt="Login Illustration"
                                     sx={{ maxWidth: "100%", height: "auto", borderRadius: 4, opacity: 0.9 }}
                                 />
@@ -214,7 +210,7 @@ const LoginPage: React.FC = () => {
                             sx={{
                                 p: 4,
                                 borderRadius: 3,
-                                backgroundColor: theme.palette.mode === 'dark' ? "rgba(10, 10, 20, 0.7)" : "rgba(255, 255, 255, 0.8)", // Ajustar cores
+                                backgroundColor: theme.palette.mode === 'dark' ? "rgba(10, 10, 20, 0.7)" : "rgba(255, 255, 255, 0.8)",
                                 backdropFilter: "blur(10px)",
                                 border: `1px solid ${theme.palette.divider}`,
                             }}
@@ -246,10 +242,10 @@ const LoginPage: React.FC = () => {
                                     <Alert severity="error" sx={{ mb: 2 }}>{submitError}</Alert>
                                 )}
 
-                                <FormControl fullWidth sx={{ mb: 1 }}> {/* Adicionado FormControl e margem */}
-                                    <FormLabel htmlFor="email" sx={{ mb: 0.5 }}></FormLabel> {/* Adicionado FormLabel */}
+                                <FormControl fullWidth sx={{ mb: 1 }}>
+                                    <FormLabel htmlFor="email" sx={{ mb: 0.5 }}></FormLabel>
                                     <TextField
-                                        required fullWidth id="email" name="email" label="Email" // Label opcional se usar FormLabel
+                                        required fullWidth id="email" name="email" label="Email"
                                         autoComplete="email" autoFocus
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
@@ -259,10 +255,10 @@ const LoginPage: React.FC = () => {
                                     />
                                 </FormControl>
 
-                                <FormControl fullWidth sx={{ mb: 1 }}> {/* Adicionado FormControl */}
-                                    <FormLabel htmlFor="password" sx={{ mb: 0.5 }}></FormLabel> {/* Adicionado FormLabel */}
+                                <FormControl fullWidth sx={{ mb: 1 }}>
+                                    <FormLabel htmlFor="password" sx={{ mb: 0.5 }}></FormLabel>
                                     <TextField
-                                        required fullWidth name="password" label="Senha" // Label opcional
+                                        required fullWidth name="password" label="Senha"
                                         type={showPassword ? "text" : "password"}
                                         id="password"
                                         placeholder="••••••"
@@ -273,8 +269,8 @@ const LoginPage: React.FC = () => {
                                         helperText={passwordError}
                                         disabled={isLoading}
                                         slotProps={{
-                                            input: { // <<< Alvo: O slot do componente Input subjacente (OutlinedInput, etc.)
-                                                endAdornment: ( // <<< Prop passada para o componente 'input'
+                                            input: {
+                                                endAdornment: (
                                                     <InputAdornment position="end">
                                                         <IconButton
                                                             aria-label="toggle password visibility"
@@ -290,18 +286,11 @@ const LoginPage: React.FC = () => {
                                     />
                                 </FormControl>
 
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} color="primary" size="small" disabled={isLoading}/>
-                                        }
-                                        label={<Typography variant="body2">Lembrar-me</Typography>}
-                                    />
-                                    {/*<Link component={RouterLink} to="/recuperar-senha" // <<< ROTA PARA RECUPERAR SENHA
-                                           variant="body2"
-                                           sx={{color: "primary.main", "&:hover": {textDecoration: "underline"}}}>
-                                        Esqueceu a senha?
-                                    </Link>*/}
+                                <Box sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    mb: 2 }}>
                                 </Box>
 
                                 <Button type="submit" fullWidth variant="contained" disabled={isLoading}
@@ -318,15 +307,12 @@ const LoginPage: React.FC = () => {
 
                                 <Grid container spacing={2} sx={{ mb: 3 }}>
                                     <Grid size={{xs:4}} >
-                                        {/* TODO: Implementar onClick para login social */}
                                         <SocialButton fullWidth startIcon={<GoogleIcon />} disabled={isLoading}> Google </SocialButton>
                                     </Grid>
                                     <Grid size={{xs:4}}>
-                                        {/* TODO: Implementar onClick para login social */}
                                         <SocialButton fullWidth startIcon={<FacebookIcon />} disabled={isLoading}> Facebook </SocialButton>
                                     </Grid>
                                     <Grid size={{xs:4}}>
-                                        {/* TODO: Implementar onClick para login social */}
                                         <SocialButton fullWidth startIcon={<AppleIcon />} disabled={isLoading}> Apple </SocialButton>
                                     </Grid>
                                 </Grid>
@@ -334,13 +320,13 @@ const LoginPage: React.FC = () => {
                                 <Box sx={{ textAlign: "center" }}>
                                     <Typography variant="body2" color="text.secondary">
                                         Não tem uma conta?{" "}
-                                        <Link component={RouterLink} to="/register" // <<< ROTA PARA CADASTRO
+                                        <Link component={RouterLink} to="/register"
                                               sx={{ color: "primary.main", fontWeight: 600, "&:hover": { textDecoration: "underline" } }}>
                                             Cadastre-se
                                         </Link>
                                     </Typography>
                                 </Box>
-                            </Box> {/* Fechamento do Box do form */}
+                            </Box>
                         </Paper>
                     </Grid>
                 </Grid>

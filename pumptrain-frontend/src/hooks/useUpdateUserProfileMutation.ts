@@ -3,10 +3,6 @@ import apiClient from '../api/apiClient';
 import { User } from '../types/user';
 import { useSnackbar } from '../context/SnackbarProvider';
 
-// Tipo do payload que a API de atualização espera
-// Pode ser Partial<User> se você envia apenas campos modificados (PATCH)
-// Ou um DTO específico se você envia todos os campos (PUT)
-// Vamos usar Partial<User> como exemplo genérico
 type UpdateProfilePayload = Partial<Omit<User, 'id'>>;
 
 export const useUpdateUserProfileMutation = () => {

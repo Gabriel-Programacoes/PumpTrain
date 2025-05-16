@@ -1,4 +1,3 @@
-// src/pages/AchievementsPage/AchievementsPage.tsx (Completo com correção da Barra de Progresso)
 import React, { useState, useMemo } from "react";
 import {
     Box, Typography, Card, CardContent, Grid, Chip, LinearProgress,
@@ -124,10 +123,7 @@ const AchievementDialog = ({ open, achievement, onClose }: { open: boolean; achi
                 <Divider sx={{ my: 2, borderColor: "divider" }} />
                 <Grid container spacing={2} sx={{ mb: 2 }}>
                     <Grid size={{xs: 6}}> <Typography variant="caption" color="text.secondary">Categoria</Typography> <Typography variant="body2" fontWeight="medium">{achievement.category}</Typography> </Grid>
-                    {/* Removido XP do Dialog */}
-                    {/* <Grid size={{xs: 6}}> <Typography variant="caption" color="text.secondary">Pontos XP</Typography> <Typography variant="body2" fontWeight="medium">{achievement.xp} XP</Typography> </Grid> */}
                 </Grid>
-
                 {/* Exibição da Barra de Progresso no Dialog CORRIGIDA */}
                 {hasProgressData && !achievement.unlocked && (
                     <Box sx={{ mt: 2 }}>
@@ -141,8 +137,6 @@ const AchievementDialog = ({ open, achievement, onClose }: { open: boolean; achi
                             sx={{ height: 8, borderRadius: 1, bgcolor: "action.disabledBackground", "& .MuiLinearProgress-bar": { bgcolor: "primary.light" } }}/>
                     </Box>
                 )}
-                {/* Fim Exibição da Barra de Progresso no Dialog */}
-
                 {achievement.unlocked ? (
                     <Box sx={{ textAlign: "center", mt: 3 }}> <CelebrationIcon sx={{ color: "primary.main", fontSize: 32, mb: 1 }} /> <Typography variant="body2" color="text.secondary">Você conquistou esta realização em {achievement.date ? formatDate(achievement.date, 'DD/MM/YY') : 'data não registrada'}!</Typography> </Box>
                 ) : (
@@ -184,12 +178,11 @@ const AchievementsPage: React.FC = () => {
 
     const stats = useMemo(() => {
         if (isLoading || isError || !Array.isArray(allAchievementsData)) {
-            return { total: 0, unlocked: 0 }; // Removido xpTotal
+            return { total: 0, unlocked: 0 };
         }
         return {
             total: allAchievementsData.length,
             unlocked: allAchievementsData.filter((a) => a.unlocked).length,
-            // xpTotal: allAchievementsData.filter((a) => a.unlocked).reduce((sum, a) => sum + a.xp, 0), // Removido XP
         };
     }, [allAchievementsData, isLoading, isError]);
 
@@ -200,14 +193,12 @@ const AchievementsPage: React.FC = () => {
     // --- Renderização com Loading/Error States ---
     if (isLoading) {
         // ... (Seu JSX de Skeleton como antes) ...
-        return <Container maxWidth="lg" sx={{ py: 4 }}> {/* ... Skeletons ... */} </Container>;
+        return <Container maxWidth="lg" sx={{ py: 4 }}> </Container>;
     }
     if (isError) {
         return <Container maxWidth="lg" sx={{ py: 4 }}><Alert severity="error">Erro ao carregar conquistas: {error instanceof Error ? error.message : 'Erro desconhecido'}</Alert></Container>;
     }
     // --- Fim Loading/Error States ---
-
-    // const filteredAchievements = getFilteredAchievements(); // Chamado pelo useMemo agora
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -218,7 +209,6 @@ const AchievementsPage: React.FC = () => {
                 {/* Estatísticas Resumidas (Removido Card de XP) */}
                 <Grid container spacing={2} justifyContent="center" sx={{ mt: 2, mb: 4 }}>
                     <Grid size={{xs:12, sm: 6, md:4}}><Card variant="outlined" sx={{bgcolor:"action.hover", height:'100%'}}><CardContent sx={{textAlign: 'center', py:2}}><TrophyIcon sx={{fontSize:32, color:"primary.main", mb:0.5}}/><Typography variant="h6" fontWeight="bold">{isLoading ? <Skeleton width={50} sx={{mx:'auto'}}/> : `${stats.unlocked}/${stats.total}`}</Typography><Typography variant="caption" color="text.secondary">Desbloqueadas</Typography></CardContent></Card></Grid>
-                    {/* O Card de XP foi removido, ajustar o grid se necessário ou adicionar outro stat */}
                     <Grid size={{xs:12, sm: 6, md:4}}><Card variant="outlined" sx={{bgcolor:"action.hover", height:'100%'}}><CardContent sx={{textAlign: 'center', py:2}}><LockIcon sx={{fontSize:32, color:"primary.main", mb:0.5}}/><Typography variant="h6" fontWeight="bold">{isLoading ? <Skeleton width={30} sx={{mx:'auto'}}/> : (stats.total - stats.unlocked)}</Typography><Typography variant="caption" color="text.secondary">Restantes</Typography></CardContent></Card></Grid>
                 </Grid>
                 {/* Barra de progresso geral */}
