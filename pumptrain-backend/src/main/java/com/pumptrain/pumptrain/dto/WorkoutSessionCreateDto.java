@@ -1,11 +1,14 @@
 package com.pumptrain.pumptrain.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+
 import jakarta.validation.Valid;
 
 @Data
@@ -23,4 +26,5 @@ public class WorkoutSessionCreateDto {
 
     @Valid
     private List<ActivityLogDto> activities;
+
 }

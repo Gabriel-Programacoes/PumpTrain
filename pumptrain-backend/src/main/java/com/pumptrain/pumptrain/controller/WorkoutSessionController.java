@@ -1,6 +1,5 @@
 package com.pumptrain.pumptrain.controller;
 
-import com.pumptrain.pumptrain.dto.ActivityLogDto;
 import com.pumptrain.pumptrain.dto.WorkoutSessionCreateDto;
 import com.pumptrain.pumptrain.dto.WorkoutSessionDto;
 import com.pumptrain.pumptrain.service.WorkoutSessionService;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
@@ -31,9 +29,7 @@ public class WorkoutSessionController {
     public WorkoutSessionController(WorkoutSessionService workoutSessionService) {
         this.workoutSessionService = workoutSessionService;
     }
-
     // --- Métodos de Sessão ---
-
     @PostMapping
     public ResponseEntity<?> createWorkoutSession(
             @Valid @RequestBody WorkoutSessionCreateDto createDto,
@@ -100,40 +96,6 @@ public class WorkoutSessionController {
         workoutSessionService.deleteWorkoutSession(sessionId, userEmail);
         log.info("Sessão ID: {} excluída com sucesso para usuário: {}", sessionId, userEmail);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/{workoutId}/activities") // Mapeia POST para /api/workouts/{ID_DO_TREINO}/activities
-    public ResponseEntity<?> addActivityToWorkout(
-            @PathVariable Long workoutId,           // Pega o ID do treino da URL
-            @Valid @RequestBody ActivityLogDto activityDto, // Pega os dados da nova atividade do corpo
-            Principal principal) {                 // Verifica usuário logado
-
-        // Validação de segurança
-        if (principal == null || principal.getName() == null) {
-            log.warn("Tentativa não autenticada de adicionar atividade à sessão {}", workoutId);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Autenticação necessária.");
-        }
-        String userEmail = principal.getName();
-        log.info("Controller: Req para add atividade à sessão ID {} por {}", workoutId, userEmail);
-        log.debug("Controller: Activity DTO recebido: {}", activityDto);
-
-        try {
-            // Chama o método do serviço
-            ActivityLogDto createdActivity = workoutSessionService.addActivityToSession(workoutId, activityDto, userEmail);
-            log.info("Controller: Atividade adicionada com ID {} à sessão {}", createdActivity.getId(), workoutId);
-            // Retorna 201 Created com a atividade criada
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdActivity);
-
-        } catch (EntityNotFoundException e) { // Captura erros específicos se o serviço os lançar
-            log.warn("Falha ao add atividade à sessão {} ({}): {}", workoutId, e.getClass().getSimpleName(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // 404 se sessão/exercício não encontrado
-        } catch (AccessDeniedException e) {
-            log.warn("Falha ao add atividade à sessão {} (AccessDenied): {}", workoutId, e.getMessage());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 403 Forbidden
-        } catch (Exception e) {
-            log.error("Erro inesperado ao add atividade à sessão {}", workoutId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao adicionar atividade.");
-        }
     }
 
     // ===> MÉ TO DO PARA EDITAR <===

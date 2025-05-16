@@ -85,10 +85,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/workouts/{id}/complete").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/workouts/{id}").authenticated()
 
-                        // Endpoints de Activity
-                        .requestMatchers(HttpMethod.PUT, "/api/activities/{id}").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/activities/{id}").authenticated()
-
                         // --- QUALQUER OUTRA REQUISIÇÃO ---
                         .anyRequest().authenticated()
                 )

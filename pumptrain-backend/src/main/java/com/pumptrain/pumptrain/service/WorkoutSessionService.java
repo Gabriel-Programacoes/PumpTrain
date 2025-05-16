@@ -6,56 +6,37 @@ import com.pumptrain.pumptrain.dto.WorkoutSessionDto;
 import com.pumptrain.pumptrain.entity.ActivityLog;
 import com.pumptrain.pumptrain.entity.Exercise;
 import com.pumptrain.pumptrain.entity.User;
-import com.pumptrain.pumptrain.mapper.WorkoutSessionMapper;
-import com.pumptrain.pumptrain.mapper.ActivityLogMapper;
 import com.pumptrain.pumptrain.entity.WorkoutSession;
+import com.pumptrain.pumptrain.mapper.ActivityLogMapper;
+import com.pumptrain.pumptrain.mapper.WorkoutSessionMapper;
 import com.pumptrain.pumptrain.repository.ActivityLogRepository;
 import com.pumptrain.pumptrain.repository.ExerciseRepository;
 import com.pumptrain.pumptrain.repository.UserRepository;
 import com.pumptrain.pumptrain.repository.WorkoutSessionRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class WorkoutSessionService {
 
     private final WorkoutSessionRepository workoutSessionRepository;
-    private final ActivityLogRepository activityLogRepository;
     private final UserRepository userRepository;
+    ActivityLogRepository activityLogRepository;
     private final ExerciseRepository exerciseRepository;
     private final ActivityLogMapper activityLogMapper;
     private final WorkoutSessionMapper workoutSessionMapper;
     private final AchievementService achievementService;
-
-    @Autowired
-    public WorkoutSessionService(WorkoutSessionRepository workoutSessionRepository,
-                                 ActivityLogRepository activityLogRepository,
-                                 UserRepository userRepository,
-                                 ExerciseRepository exerciseRepository,
-                                 ActivityLogMapper activityLogMapper,
-                                 WorkoutSessionMapper workoutSessionMapper, AchievementService achievementService) {
-        this.workoutSessionRepository = workoutSessionRepository;
-        this.activityLogRepository = activityLogRepository;
-        this.userRepository = userRepository;
-        this.exerciseRepository = exerciseRepository;
-        this.activityLogMapper = activityLogMapper;
-        this.workoutSessionMapper = workoutSessionMapper;
-        this.achievementService = achievementService;
-    }
-
-    // --- Operações de Sessão ---
 
     @Transactional
     public WorkoutSessionDto createWorkoutSession(WorkoutSessionCreateDto createDto, String userEmail) {
@@ -69,82 +50,58 @@ public class WorkoutSessionService {
                 });
         log.debug("Usuário {} encontrado para criação da sessão.", userEmail);
 
-        // 1. Cria e salva a entidade WorkoutSession principal
         WorkoutSession newSession = new WorkoutSession();
         newSession.setUser(user);
-        LocalDate sessionDate = createDto.getSessionDate() != null ? createDto.getSessionDate() : LocalDate.now();
-        newSession.setSessionDate(sessionDate);
+        newSession.setSessionDate(createDto.getSessionDate() != null ? createDto.getSessionDate() : LocalDate.now());
         newSession.setName(createDto.getName());
         newSession.setNotes(createDto.getNotes());
-        // Garante que a lista de atividades na entidade esteja inicializada
-        if (newSession.getActivities() == null) {
-            newSession.setActivities(new ArrayList<>());
-        }
 
-        // Salva a sessão principal PRIMEIRO para obter um ID gerenciado
-        WorkoutSession savedSession = workoutSessionRepository.save(newSession);
-        log.info("Sessão de treino principal salva com ID {} para usuário {}", savedSession.getId(), userEmail);
 
-// 2. Processa e associa as atividades
         if (createDto.getActivities() != null && !createDto.getActivities().isEmpty()) {
-            log.debug("Processando {} atividades recebidas no DTO para a sessão ID {}", createDto.getActivities().size(), savedSession.getId());
+            log.debug("Processando {} atividades do DTO para adicionar à nova sessão.", createDto.getActivities().size());
 
             for (ActivityLogDto activityDto : createDto.getActivities()) {
 
-                // Busca o exercício correspondente
                 Exercise exercise = exerciseRepository.findById(activityDto.getExerciseId())
                         .orElseThrow(() -> {
-                            // Este erro ainda é possível se o ID existir no DTO mas não no banco
-                            log.warn("Falha ao adicionar atividade: Exercício ID {} não encontrado no banco de dados.", activityDto.getExerciseId());
+                            log.warn("Falha ao adicionar atividade: Exercício ID {} não encontrado.", activityDto.getExerciseId());
                             return new EntityNotFoundException("Exercício não encontrado com ID: " + activityDto.getExerciseId());
                         });
-                log.trace("Exercício ID {} encontrado para a atividade.", exercise.getId());
+                log.trace("Exercício ID {} (Nome: '{}') encontrado para a atividade.", exercise.getId(), exercise.getName());
 
-                // Mapeia DTO da atividade para Entidade
+
                 ActivityLog activityEntity = activityLogMapper.toEntity(activityDto);
 
-                activityEntity.setWorkoutSession(savedSession);
+
                 activityEntity.setExercise(exercise);
 
-                log.debug("Valores da Entidade ActivityLog ANTES da persistência via cascata: ID={}, Reps='{}', Peso='{}'",
-                        activityEntity.getId(),
-                        activityEntity.getRepetitions(),
-                        activityEntity.getWeightKg());
 
-                // Adiciona a entidade à lista gerenciada pela sessão salva.
-                savedSession.getActivities().add(activityEntity);
+                newSession.addActivity(activityEntity);
 
-                log.debug("Entidade ActivityLog mapeada e associada à sessão ID {}", savedSession.getId());
+                log.debug("Entidade ActivityLog com Exercise '{}' adicionada à coleção da newSession.", exercise.getName());
             }
-            log.info("{} atividades processadas e associadas à sessão ID {}", createDto.getActivities().size(), savedSession.getId());
-
+            log.info("{} atividades processadas e adicionadas à coleção da newSession.", newSession.getActivities().size());
         } else {
-            log.debug("Nenhuma atividade recebida no DTO para a sessão ID {}", savedSession.getId());
+            log.debug("Nenhuma atividade recebida no DTO para a nova sessão.");
         }
 
-        // 3. Retorna o DTO da sessão completa
-        // O mapper converterá a Entidade 'savedSession', que agora contém as atividades
-        // associadas (que serão/foram salvas pela cascata), para o DTO de resposta.
+        WorkoutSession savedSession = workoutSessionRepository.save(newSession);
+        log.info("Sessão de treino ID {} e suas {} atividades salvas com sucesso para usuário {}",
+                savedSession.getId(), savedSession.getActivities() != null ? savedSession.getActivities().size() : 0, userEmail);
+
         return workoutSessionMapper.toDto(savedSession);
     }
 
     @Transactional(readOnly = true)
     public List<WorkoutSessionDto> getWorkoutSessionsForUser(String userEmail) {
         log.info("Buscando sessões de treino para usuário: {}", userEmail);
-
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> {
-                    log.warn("Falha ao buscar sessões: Usuário não encontrado com email {}", userEmail);
-                    return new EntityNotFoundException("Usuário não encontrado com email: " + userEmail);
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com email: " + userEmail));
 
         List<WorkoutSession> sessions = workoutSessionRepository.findByUserOrderBySessionDateDesc(user);
         log.debug("Encontradas {} sessões para usuário {}", sessions.size(), userEmail);
-
-        List<WorkoutSessionDto> sessionDtos = workoutSessionMapper.toDto(sessions);
-        log.debug("Convertidas {} sessões para DTO.", sessionDtos.size());
-
-        return sessionDtos;
+        // O WorkoutSessionMapper agora mapeará a lista de Exercise para List<ExerciseDto>
+        return workoutSessionMapper.toDto(sessions);
     }
 
     @Transactional(readOnly = true)
@@ -217,7 +174,6 @@ public class WorkoutSessionService {
     public WorkoutSessionDto updateWorkoutSession(Long sessionId, WorkoutSessionDto updateDto, String userEmail) {
         log.info("Tentando atualizar sessão ID {} para usuário {}", sessionId, userEmail);
 
-        // 1. Buscar usuário e sessão existente
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com email: " + userEmail));
 
@@ -225,103 +181,77 @@ public class WorkoutSessionService {
                 .orElseThrow(() -> new EntityNotFoundException("Sessão de treino não encontrada com ID: " + sessionId));
         log.debug("Sessão ID {} encontrada para atualização.", sessionId);
 
-        // 2. Verificar permissão
         if (!existingSession.getUser().getId().equals(user.getId())) {
             log.warn("Acesso negado: Usuário {} tentou atualizar sessão ID {} que pertence a outro usuário (ID: {}).",
                     userEmail, sessionId, existingSession.getUser().getId());
             throw new AccessDeniedException("Usuário não autorizado a atualizar esta sessão de treino.");
         }
-        log.debug("Verificação de permissão OK para atualizar sessão ID {} por usuário {}", sessionId, userEmail);
 
-        // 3. Atualizar campos da Sessão Principal
+        // Atualizar campos da Sessão Principal
         existingSession.setName(updateDto.getName());
         existingSession.setSessionDate(updateDto.getSessionDate());
         existingSession.setStartTime(updateDto.getStartTime());
         existingSession.setEndTime(updateDto.getEndTime());
         existingSession.setNotes(updateDto.getNotes());
+        // Não alterar completedAt aqui, isso é feito por markWorkoutAsComplete
         log.debug("Campos principais da sessão ID {} atualizados.", sessionId);
 
-        // 4. Atualizar Atividades (Estratégia de Substituição Completa)
+        List<ActivityLog> oldActivities = new ArrayList<>(existingSession.getActivities());
+        for (ActivityLog oldActivity : oldActivities) {
+            existingSession.removeActivity(oldActivity);
+        }
+        // Neste ponto, orphanRemoval=true (na entidade WorkoutSession) cuidará de deletar
+        // as ActivityLogs antigas do banco quando a sessão for salva.
+        log.debug("Atividades existentes removidas da sessão ID {} usando o método removeActivity.", sessionId);
 
-        // 4.1 Limpar as atividades existentes da coleção gerenciada pelo JPA.
-        // IMPORTANTE: Isso requer `orphanRemoval=true` na relação @OneToMany em WorkoutSession
-        // para que o JPA delete os registros antigos do banco de dados.
-        existingSession.getActivities().clear();
-        log.debug("Coleção de atividades existente limpa para sessão ID {}. OrphanRemoval removerá do BD.", sessionId);
-
-        // 4.2 Adicionar as novas atividades (vindas do DTO) à coleção
+        // 2. Adicionar as novas atividades (vindas do DTO) à coleção
         if (updateDto.getActivities() != null && !updateDto.getActivities().isEmpty()) {
             log.debug("Processando {} novas atividades do DTO para sessão ID {}", updateDto.getActivities().size(), sessionId);
             for (ActivityLogDto activityDto : updateDto.getActivities()) {
-                // Validações (ex: exerciseId não nulo) devem ser feitas pelo @Valid no controller
 
                 Exercise exercise = exerciseRepository.findById(activityDto.getExerciseId())
-                        .orElseThrow(() -> new EntityNotFoundException("Exercício não encontrado com ID: " + activityDto.getExerciseId()));
+                        .orElseThrow(() -> {
+                            log.warn("Falha ao adicionar atividade na atualização: Exercício ID {} não encontrado.", activityDto.getExerciseId());
+                            return new EntityNotFoundException("Exercício não encontrado com ID: " + activityDto.getExerciseId());
+                        });
 
-                // Mapeia DTO para uma NOVA entidade ActivityLog
                 ActivityLog newActivityEntity = activityLogMapper.toEntity(activityDto);
+                newActivityEntity.setExercise(exercise); // Associa o exercício
 
-                // Associa a NOVA entidade ao exercício e à sessão existente
-                newActivityEntity.setExercise(exercise);
-                newActivityEntity.setWorkoutSession(existingSession); // Associa à sessão que estamos atualizando
-
-                // Adiciona a NOVA entidade à coleção (agora vazia) da sessão
-                // CascadeType.ALL garantirá que estas novas entidades sejam persistidas
-                existingSession.getActivities().add(newActivityEntity);
+                existingSession.addActivity(newActivityEntity);
                 log.trace("Nova entidade ActivityLog (Ex ID {}) adicionada à sessão ID {}", exercise.getId(), sessionId);
             }
-            log.debug("{} novas atividades adicionadas à sessão ID {}", updateDto.getActivities().size(), sessionId);
+            log.debug("{} novas atividades adicionadas à sessão ID {}", existingSession.getActivities().size(), sessionId);
         } else {
             log.debug("Nenhuma atividade fornecida no DTO de atualização para sessão ID {}", sessionId);
         }
+        // --- FIM DA ATUALIZAÇÃO DAS ATIVIDADES ---
 
+        WorkoutSession savedSession = workoutSessionRepository.save(existingSession);
+        log.info("Sessão ID {} atualizada com sucesso, incluindo atividades.", savedSession.getId());
 
-        // 5. Salvar a Sessão Atualizada (Opcional, mas explícito)
-        // Como 'existingSession' é uma entidade gerenciada, o JPA pode detectar
-        // as alterações e persisti-las no commit da transação. Mas salvar explicitamente
-        // pode ser mais claro e às vezes necessário dependendo da complexidade.
-        WorkoutSession savedSession = workoutSessionRepository.save(existingSession); // Descomente se preferir/necessário
-
-        log.info("Atualização da sessão ID {} pronta para commit.", sessionId);
-
-        // 6. Mapear a entidade atualizada (existingSession ou savedSession) de volta para DTO
-        // O mapper pegará a lista atualizada de atividades da entidade.
-        return workoutSessionMapper.toDto(existingSession); // ou workoutSessionMapper.toDto(savedSession)
+        return workoutSessionMapper.toDto(savedSession);
     }
 
     @Transactional
     public void deleteWorkoutSession(Long sessionId, String userEmail) {
         log.info("Tentando excluir sessão ID {} para usuário {}", sessionId, userEmail);
-
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> {
-                    log.warn("Falha ao excluir sessão ID {}: Usuário {} não encontrado.", sessionId, userEmail);
-                    return new EntityNotFoundException("Usuário não encontrado com email: " + userEmail);
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com email: " + userEmail));
 
         WorkoutSession session = workoutSessionRepository.findById(sessionId)
-                .orElseThrow(() -> {
-                    log.warn("Falha ao excluir: Sessão de treino ID {} não encontrada.", sessionId);
-                    return new EntityNotFoundException("Sessão de treino não encontrada com ID: " + sessionId);
-                });
+                .orElseThrow(() -> new EntityNotFoundException("Sessão de treino não encontrada com ID: " + sessionId));
         log.debug("Sessão ID {} encontrada para exclusão.", sessionId);
 
-        // Verificação de permissão
         if (!session.getUser().getId().equals(user.getId())) {
-            log.warn("Acesso negado: Usuário {} tentou excluir sessão ID {} que pertence a outro usuário (ID: {}).",
-                    userEmail, sessionId, session.getUser().getId());
+            log.warn("Acesso negado: Usuário {} tentou excluir sessão ID {} de outro usuário.", userEmail, sessionId);
             throw new AccessDeniedException("Usuário não autorizado a excluir esta sessão de treino.");
         }
-        log.debug("Verificação de permissão OK para excluir sessão ID {} por usuário {}", sessionId, userEmail);
 
-        // Exclui a sessão (CascadeType.ALL deve cuidar das ActivityLogs associadas)
         workoutSessionRepository.delete(session);
         log.info("Sessão de treino ID {} excluída com sucesso por usuário {}", sessionId, userEmail);
     }
 
-    // --- Operações de Atividade ---
-
-    @Transactional
     public ActivityLogDto addActivityToSession(Long sessionId, ActivityLogDto activityDto, String userEmail) {
         log.info("Tentando adicionar atividade à sessão EXISTENTE ID {} para usuário {}", sessionId, userEmail);
         log.debug("Dados da atividade recebida: {}", activityDto);
@@ -376,8 +306,6 @@ public class WorkoutSessionService {
                 });
 
         ActivityLog activityLog = activityLogRepository.findById(activityId)
-                // Garante que a sessão seja carregada para verificar permissão
-                // Pode ser necessário um fetch join na query ou carregar explicitamente
                 .map(activity -> {
                     // Força o carregamento da sessão se for LAZY
                     activity.getWorkoutSession().getId();
@@ -458,28 +386,22 @@ public class WorkoutSessionService {
     @Transactional
     public WorkoutSessionDto markWorkoutAsComplete(Long sessionId, String userEmail) {
         log.info("Tentando marcar treino ID {} como concluído para usuário {}", sessionId, userEmail);
-
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado: " + userEmail));
 
         WorkoutSession session = workoutSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new EntityNotFoundException("Sessão de treino não encontrada com ID: " + sessionId));
 
-        // Verificar permissão
         if (!session.getUser().getId().equals(user.getId())) {
             log.warn("Acesso negado: Usuário {} tentou marcar treino ID {} de outro usuário.", userEmail, sessionId);
             throw new AccessDeniedException("Usuário não autorizado a modificar esta sessão de treino.");
         }
 
-        // Verificar se já não está concluído (opcional, mas bom)
         if (session.getCompletedAt() != null) {
             log.warn("Treino ID {} já estava marcado como concluído em {}. Nenhuma alteração feita.", sessionId, session.getCompletedAt());
-            // Pode retornar o DTO existente ou lançar uma exceção informando
-            // return workoutSessionMapper.toDto(session); // Retorna estado atual
-            throw new IllegalStateException("Este treino já foi marcado como concluído."); // Ou lança erro
+            return workoutSessionMapper.toDto(session); // Retorna o estado atual
         }
 
-        // Marcar como concluído
         session.setCompletedAt(LocalDateTime.now());
         log.debug("Definindo completedAt para {} na sessão ID {}", session.getCompletedAt(), sessionId);
 
@@ -488,17 +410,14 @@ public class WorkoutSessionService {
 
         try {
             log.info(">>> PRESTES A CHAMAR achievementService.checkAndAwardAchievements para usuário {} <<<", user.getEmail());
-            achievementService.checkAndAwardAchievements(user);
+            achievementService.checkAndAwardAchievements(user); // Passa o objeto User
             log.info(">>> achievementService.checkAndAwardAchievements CHAMADO com sucesso <<<");
         } catch (Exception e) {
-            log.error("Erro ao verificar/conceder conquistas para o usuário {} [...]: {}",
-                    user.getEmail(), e.getMessage(), e);
+            log.error("Erro ao verificar/conceder conquistas para o usuário {} após completar treino ID {}: {}",
+                    user.getEmail(), savedSession.getId(), e.getMessage(), e);
         }
-
         return workoutSessionMapper.toDto(savedSession);
     }
-
-
 
     @Transactional(readOnly = true)
     public Optional<WorkoutSessionDto> getWorkoutOfTheDay(String userEmail) {
@@ -509,20 +428,16 @@ public class WorkoutSessionService {
         LocalDate today = LocalDate.now();
         log.debug("Buscando treinos para usuário ID {} na data {}", user.getId(), today);
 
-        // Busca treinos para hoje que não estão completos
         List<WorkoutSession> workoutsForToday = workoutSessionRepository
                 .findByUserAndSessionDateAndCompletedAtIsNullOrderByIdDesc(user, today);
 
         if (workoutsForToday.isEmpty()) {
             log.info("Nenhum treino não concluído encontrado para hoje para o usuário {}", userEmail);
-            return Optional.empty(); // Retorna vazio se não houver treino para hoje
+            return Optional.empty();
         } else {
-            // Pega o primeiro da lista (que é o mais recente criado para hoje, devido ao OrderByIdDesc)
-            WorkoutSession workoutOfTheDay = workoutsForToday.get(0);
+            WorkoutSession workoutOfTheDay = workoutsForToday.getFirst();
             log.info("Treino do Dia encontrado (ID: {}) para usuário {}", workoutOfTheDay.getId(), userEmail);
-            // Mapeia para DTO e retorna
             return Optional.of(workoutSessionMapper.toDto(workoutOfTheDay));
         }
     }
-
 }

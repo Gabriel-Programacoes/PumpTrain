@@ -7,7 +7,6 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-// Informa ao MapStruct para usar o ActivityLogMapper para mapear a lista de atividades
 @Mapper(componentModel = "spring", uses = {ActivityLogMapper.class})
 public interface WorkoutSessionMapper {
 

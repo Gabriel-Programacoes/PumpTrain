@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -40,14 +42,13 @@ public class WorkoutSession {
     @Column // Hora de fim
     private LocalTime endTime;
 
-    @Column(length = 1000) // Notas gerais sobre a sessão
+    @Column(length = 1000) 
     private String notes;
 
     @Column(nullable = true)
     private LocalDateTime completedAt;
 
     // --- Relacionamento com ActivityLog ---
-    // Uma WorkoutSession tem muitas ActivityLog
     @OneToMany(
             mappedBy = "workoutSession", // Indica que o campo 'workoutSession' na classe ActivityLog gerencia este lado da relação
             cascade = CascadeType.ALL,   // Se salvar/deletar uma Session, salva/deleta as Activities junto
@@ -58,13 +59,22 @@ public class WorkoutSession {
 
     // Métodos auxiliares
     public void addActivity(ActivityLog activity) {
-        activities.add(activity);
-        activity.setWorkoutSession(this);
+        if (activity != null) {
+            if (this.activities == null) {
+                this.activities = new ArrayList<>();
+            }
+            this.activities.add(activity);
+            activity.setWorkoutSession(this); // <<< Linha crucial para a relação bidirecional
+        }
     }
 
     public void removeActivity(ActivityLog activity) {
-        activities.remove(activity);
-        activity.setWorkoutSession(null);
+        if (activity != null && this.activities != null) { // Garante que 'activity' e a coleção 'activities' não são nulas
+            boolean removed = this.activities.remove(activity);
+            if (removed) { // Apenas define workoutSession como null se realmente foi removido da lista
+                activity.setWorkoutSession(null);
+            }
+        }
     }
 
     @Transient

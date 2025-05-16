@@ -32,16 +32,6 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
     long countByUser(User user);
 
     /**
-     * Conta o número de sessões de treino para um usuário específico dentro de um
-     * intervalo de datas de sessão (sessionDate).
-     *
-     * @param user O usuário.
-     * @param startDate A data de início do intervalo
-     * @param endDate A data de fim do intervalo
-     * @return O número de sessões de treino no intervalo
-     */
-
-    /**
      * Conta o número de sessões de treino concluídas por um usuário dentro de um intervalo de timestamps.
      * Usado para calcular treinos concluídos no mês atual para conquistas como "PERFECT_MONTH".
      *
@@ -73,5 +63,12 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
      */
     @Query("SELECT COUNT(ws) FROM WorkoutSession ws WHERE ws.user = :user AND ws.completedAt IS NOT NULL")
     long countByUserAndCompletedAtIsNotNull(@Param("user") User user);
+
+
+
+
+    @Query("SELECT ws.completedAt FROM WorkoutSession ws WHERE ws.user = :user AND ws.completedAt IS NOT NULL ORDER BY ws.completedAt DESC")
+    List<LocalDateTime> findCompletedAtTimestampsByUserOrderByCompletedAtDesc(@Param("user") User user); // <<< ESTE MÉTODO PRECISA EXISTIR
+
 
 }
