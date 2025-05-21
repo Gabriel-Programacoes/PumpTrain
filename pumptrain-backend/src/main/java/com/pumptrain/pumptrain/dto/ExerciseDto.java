@@ -1,5 +1,6 @@
 package com.pumptrain.pumptrain.dto;
 
+import com.pumptrain.pumptrain.entity.enums.ExerciseType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +15,6 @@ public class ExerciseDto {
     private String description;
     private String muscleGroup;
     private String equipment;
+    private ExerciseType exerciseType;
 
 }

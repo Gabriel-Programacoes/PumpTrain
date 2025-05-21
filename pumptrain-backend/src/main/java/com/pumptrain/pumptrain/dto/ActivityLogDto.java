@@ -1,5 +1,7 @@
 package com.pumptrain.pumptrain.dto;
 
+import com.pumptrain.pumptrain.entity.enums.ExerciseType;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,8 @@ public class ActivityLogDto {
 
     private String exerciseName; // Nome do exercício
 
+    private ExerciseType exerciseType;
+
     @Min(value = 1, message = "Número de séries (sets) deve ser maior que zero.")
     private Integer sets;
 
@@ -30,9 +34,11 @@ public class ActivityLogDto {
     @Size(max = 100, message = "O campo de peso (weightKg) não pode exceder 100 caracteres!")
     private String weightKg;    // Ex: "50, 55, 60"
 
+    @Column
     @Min(value = 1, message = "A duração em minutos (durationMinutes) deve ser maior que zero.")
     private Integer durationMinutes;
 
+    @Column
     @DecimalMin(value = "0.0", inclusive = false, message = "A distância em quilômetros (distanceKm) deve ser maior que zero.")
     private Double distanceKm;
 
@@ -42,9 +48,10 @@ public class ActivityLogDto {
     private LocalDateTime activityTimestamp;
 
     // Construtor adicional sem ID e timestamp (útil para criação)
-    public ActivityLogDto(Long exerciseId, String exerciseName, Integer sets, String repetitions, String weightKg, Integer durationMinutes, Double distanceKm, String notes) {
+    public ActivityLogDto(Long exerciseId, String exerciseName, ExerciseType exerciseType, Integer sets, String repetitions, String weightKg, Integer durationMinutes, Double distanceKm, String notes) {
         this.exerciseId = exerciseId;
         this.exerciseName = exerciseName;
+        this.exerciseType = exerciseType;
         this.sets = sets;
         this.repetitions = repetitions;
         this.weightKg = weightKg;

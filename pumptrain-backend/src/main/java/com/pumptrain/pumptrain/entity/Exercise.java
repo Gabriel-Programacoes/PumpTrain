@@ -1,12 +1,10 @@
 package com.pumptrain.pumptrain.entity;
 
+import com.pumptrain.pumptrain.entity.enums.ExerciseType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -32,7 +30,11 @@ public class Exercise {
     @Column(length = 200)
     private String equipment;
 
-    public Exercise(Object id, String name, String description, String muscleGroup, String equipment) {
+    @Enumerated(EnumType.STRING)
+    @Column(name= "EXERCISE_TYPE", nullable = true, length = 20)
+    private ExerciseType exerciseType;
+
+    public Exercise(Object id, String name, String description, String muscleGroup, String equipment, ExerciseType exerciseType) {
 
     }
 }

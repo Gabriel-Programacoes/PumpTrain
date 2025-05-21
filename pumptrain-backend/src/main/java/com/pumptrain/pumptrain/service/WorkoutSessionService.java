@@ -68,14 +68,8 @@ public class WorkoutSessionService {
                             return new EntityNotFoundException("Exercício não encontrado com ID: " + activityDto.getExerciseId());
                         });
                 log.trace("Exercício ID {} (Nome: '{}') encontrado para a atividade.", exercise.getId(), exercise.getName());
-
-
                 ActivityLog activityEntity = activityLogMapper.toEntity(activityDto);
-
-
                 activityEntity.setExercise(exercise);
-
-
                 newSession.addActivity(activityEntity);
 
                 log.debug("Entidade ActivityLog com Exercise '{}' adicionada à coleção da newSession.", exercise.getName());

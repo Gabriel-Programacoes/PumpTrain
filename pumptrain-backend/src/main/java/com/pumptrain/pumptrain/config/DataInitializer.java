@@ -2,6 +2,7 @@ package com.pumptrain.pumptrain.config;
 
 import com.pumptrain.pumptrain.entity.Achievement;
 import com.pumptrain.pumptrain.entity.Exercise;
+import com.pumptrain.pumptrain.entity.enums.ExerciseType;
 import com.pumptrain.pumptrain.repository.AchievementRepository;
 import com.pumptrain.pumptrain.repository.ExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,11 @@ public class DataInitializer implements CommandLineRunner {
         if (exerciseRepository.count() == 0) {
             log.info(">>> Populando banco de dados com exercícios de exemplo...");
 
-            Exercise ex1 = new Exercise(null, "Supino Reto com Barra", "Principal exercício para peitoral maior.", "Peito", "Barra e Banco");
-            Exercise ex2 = new Exercise(null, "Agachamento Livre", "Exercício fundamental para membros inferiores.", "Pernas", "Barra");
-            Exercise ex3 = new Exercise(null, "Levantamento Terra", "Exercício composto que trabalha costas, pernas e glúteos.", "Costas", "Barra");
-            Exercise ex4 = new Exercise(null, "Corrida na Esteira", "Exercício cardiovascular.", "Cardio", "Esteira");
-            Exercise ex5 = new Exercise(null, "Rosca Direta com Barra", "Exercício para bíceps.", "Bíceps", "Barra");
+            Exercise ex1 = new Exercise(null, "Supino Reto com Barra", "Principal exercício para peitoral maior.", "Peito", "Barra e Banco", ExerciseType.STRENGTH);
+            Exercise ex2 = new Exercise(null, "Agachamento Livre", "Exercício fundamental para membros inferiores.", "Pernas", "Barra", ExerciseType.STRENGTH);
+            Exercise ex3 = new Exercise(null, "Levantamento Terra", "Exercício composto que trabalha costas, pernas e glúteos.", "Costas", "Barra", ExerciseType.STRENGTH);
+            Exercise ex4 = new Exercise(null, "Corrida na Esteira", "Exercício cardiovascular.", "Cardio", "Esteira", ExerciseType.CARDIO);
+            Exercise ex5 = new Exercise(null, "Rosca Direta com Barra", "Exercício para bíceps.", "Bíceps", "Barra", ExerciseType.STRENGTH);
 
             List<Exercise> exercises = Arrays.asList(ex1, ex2, ex3, ex4, ex5);
             exerciseRepository.saveAll(exercises);

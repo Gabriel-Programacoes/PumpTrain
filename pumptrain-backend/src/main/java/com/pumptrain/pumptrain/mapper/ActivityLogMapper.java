@@ -13,6 +13,7 @@ public interface ActivityLogMapper {
 
     @Mapping(source = "exercise.id", target = "exerciseId")
     @Mapping(source = "exercise.name", target = "exerciseName")
+    @Mapping(source = "exercise.exerciseType", target = "exerciseType")
     ActivityLogDto toDto(ActivityLog activityLog);
 
     @Mapping(target = "id", ignore = true)

@@ -1,6 +1,8 @@
 package com.pumptrain.pumptrain.dto;
 
+import com.pumptrain.pumptrain.entity.enums.ExerciseType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +25,7 @@ public class ExerciseCreateDto {
 
     @Size(max = 200, message = "A equipamento não pode exceder 200 caracteres.")
     private String equipment;
+
+    @NotNull(message = "O tipo do exercício é obrigatório!")
+    private ExerciseType exerciseType;
 }
