@@ -10,7 +10,12 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import NotesIcon from '@mui/icons-material/Notes';
 import { useExercisesQuery } from '../hooks/useExercisesQuery';
 import { WorkoutDetails } from '../types/workout';
-import dayjs from 'dayjs'; // Importar dayjs
+import dayjs from 'dayjs';
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TimerIcon from "@mui/icons-material/Timer";
+import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
+import RepeatIcon from "@mui/icons-material/Repeat"; // Importar dayjs
 
 // Formatador de data (pode vir de utils)
 const formatDate = (d: string | null | undefined, format = 'DD/MM/YYYY HH:mm') => d ? dayjs(d).format(format) : 'N/A';
@@ -35,7 +40,7 @@ export const TodaysWorkoutCard: React.FC<TodaysWorkoutCardProps> = ({ workout })
         <Card variant="outlined">
             <CardHeader
                 title="🔥 Treino do Dia"
-                titleTypographyProps={{ variant: 'h6', fontWeight: 'bold' }}
+                slotProps={{ title: {variant: 'h6', fontWeight: 'bold'} }}
                 action={
                     workout.completedAt ? (
                         <Chip icon={<CheckCircleOutlineIcon fontSize="small" />} label="Concluído" color="success" size="small" variant="outlined" />
@@ -58,16 +63,24 @@ export const TodaysWorkoutCard: React.FC<TodaysWorkoutCardProps> = ({ workout })
                                         primary={exerciseMap.get(activity.exerciseId) || `Exercício ID: ${activity.exerciseId}`}
                                         secondary={
                                             <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap" sx={{mt: 0.5}}>
-                                                {activity.sets != null && <Chip label={`${activity.sets} séries`} size="small" sx={{height: 20, fontSize: '0.7rem'}}/>}
-                                                {activity.repetitions != null && <Chip label={`${activity.repetitions} reps`} size="small" sx={{height: 20, fontSize: '0.7rem'}}/>}
-                                                {activity.weightKg != null && <Chip label={`${activity.weightKg} kg`} size="small" sx={{height: 20, fontSize: '0.7rem'}}/>}
-                                                {activity.notes && <Chip icon={<NotesIcon/>} label="Nota" size="small" sx={{height: 20, fontSize: '0.7rem'}} title={activity.notes} />}
+                                                {activity.sets != null && <Chip icon={<FitnessCenterIcon />} label={`Séries: ${activity.sets}`} size="small" variant="outlined" />}
+                                                {activity.repetitions != null && <Chip icon={<RepeatIcon />} label={`Repetições: ${activity.sets}`} size="small" variant="outlined" />}
+                                                {activity.weightKg != null && <Chip icon={<FitnessCenterIcon/>} label={`Peso: ${activity.weightKg} kg`} size="small" variant="outlined"/>}
+                                                {activity.notes && <Chip icon={<NotesIcon/>} label={`${activity.notes}`} size="small" variant="outlined" />}
+
+
+
+
+                                                {activity.durationMinutes != null && <Chip icon={<TimerIcon />} label={`Tempo: ${activity.durationMinutes} min`} size="small" variant="outlined" />}
+                                                {activity.distanceKm != null && <Chip icon={<DirectionsRunIcon />} label={`Distância: ${activity.distanceKm} km`} size="small" variant="outlined" />}
+                                                {activity.intensityLevel != null && <Chip icon={<WhatshotIcon />} label={`Intensidade: ${activity.intensityLevel}`} size="small" variant="outlined" />}
+                                                {activity.inclinePercent != null && <Chip icon={<TrendingUpIcon />} label={`Incl.:${activity.inclinePercent}%`} size="small" variant="outlined" />}
                                             </Stack>
                                         }
-                                        primaryTypographyProps={{fontWeight: 'medium', fontSize: '0.9rem'}}
+                                        slotProps={{primary: {fontWeight: 'medium', fontSize: '0.9rem'}}}
                                     />
                                 </ListItem>
-                                <Divider light component="li" />
+                                <Divider sx={{opacity : "0.6"}} component="li" />
                             </React.Fragment>
                         ))}
                     </List>

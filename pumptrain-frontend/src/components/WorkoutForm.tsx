@@ -25,10 +25,16 @@ import { Exercise } from '../types/exercise';
 // --- Schemas Zod ---
 const activitySchema = z.object({
     id: z.union([z.string(), z.number()]).optional().nullable(),
-    exerciseId: z.union([z.number(), z.string()]).nullable().refine(val => val !== null && val !== '', { message: 'Exercício é obrigatório para salvar a atividade' }), // <<< Adicionada validação de volta se necessário pelo refine geral
+    exerciseId: z.union([z.number(), z.string()]).nullable().refine(val => val !== null && val !== '', { message: 'Exercício é obrigatório para salvar a atividade' }),
     sets: z.number().positive('Deve ser positivo').int('Deve ser inteiro').optional().nullable(),
     reps: z.number().positive('Deve ser positivo').int('Deve ser inteiro').optional().nullable(),
     weight: z.number().positive('Deve ser positivo').optional().nullable(),
+
+    durationMinutes: z.number().positive('Deve ser positivo').int('Deve ser inteiro').optional().nullable(),
+    distanceKm: z.number().positive('Deve ser positivo').optional().nullable(),
+    intensityLevel: z.number().positive('Deve ser positivo').int('Deve ser inteiro').min(1).max(10).optional().nullable(),
+    inclinePercent: z.number().min(0).optional().nullable(),
+
     notes: z.string().max(255, 'Máximo 255 caracteres').optional().nullable(),
 });
 
@@ -44,7 +50,7 @@ const workoutFormSchema = z.object({
 
 export type WorkoutFormData = z.infer<typeof workoutFormSchema>;
 
-// --- Props (mantidas) ---
+// --- Props ---
 interface WorkoutFormProps {
     initialData?: WorkoutFormData;
     onSubmit: SubmitHandler<WorkoutFormData>;
@@ -72,7 +78,7 @@ export const WorkoutForm: React.FC<WorkoutFormProps> = ({
             sessionDate: new Date().toISOString().split('T')[0],
             name: '',
             notes: '',
-            activities: [{ exerciseId: null, sets: null, reps: null, weight: null, notes: '' }],
+            activities: [{ exerciseId: null, sets: null, reps: null, weight: null, notes: ''}],
         },
     });
 

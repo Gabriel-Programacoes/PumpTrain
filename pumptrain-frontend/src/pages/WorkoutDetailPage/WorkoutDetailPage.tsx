@@ -30,6 +30,10 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import RepeatIcon from  '@mui/icons-material/Repeat';
 import MonitorWeightIcon from '@mui/icons-material/MonitorWeight';
 import CheckCircleOutlineIcon from  '@mui/icons-material/CheckCircleOutline';
+import TimerIcon from '@mui/icons-material/Timer';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 // Hooks, Tipos, etc.
 import { useWorkoutDetailQuery } from '../../hooks/useWorkoutDetailQuery';
@@ -214,6 +218,13 @@ const WorkoutDetailPage: React.FC = () => {
                                 {activity.sets != null && <Chip icon={<RepeatIcon />} label={`Séries: ${activity.sets}`} size="small" variant="outlined" />}
                                 {activity.repetitions != null && <Chip icon={<RepeatIcon />} label={`Reps: ${activity.repetitions}`} size="small" variant="outlined" />}
                                 {activity.weightKg != null && <Chip icon={<MonitorWeightIcon />} label={`Peso: ${activity.weightKg} kg`} size="small" variant="outlined" />}
+
+                                {/* Campos de Cardio */}
+                                {activity.durationMinutes != null && <Chip icon={<TimerIcon />} label={`${activity.durationMinutes} min`} size="small" variant="outlined" />}
+                                {activity.distanceKm != null && <Chip icon={<DirectionsRunIcon />} label={`${activity.distanceKm} km`} size="small" variant="outlined" />}
+                                {activity.intensityLevel != null && <Chip icon={<WhatshotIcon />} label={`Intensidade ${activity.intensityLevel}`} size="small" variant="outlined" />}
+                                {activity.inclinePercent != null && <Chip icon={<TrendingUpIcon />} label={`${activity.inclinePercent}% incl.`} size="small" variant="outlined" />}
+
                             </Stack>
                             {activity.notes && ( <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}> <i>Nota: {activity.notes}</i> </Typography> )}
                         </Paper>

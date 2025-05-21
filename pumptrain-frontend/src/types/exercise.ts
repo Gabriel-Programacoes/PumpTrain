@@ -10,7 +10,7 @@ export interface Exercise {
     muscleGroup: string | null;
 
     // Adicionar aqui quaisquer outros campos que API retorna para um exercício:
-    type?: 'strength' | 'cardio' | 'flexibility' | string;
+    exerciseType?: 'strength' | 'cardio' | 'flexibility' | string;
     equipment?: string | null;
     imageUrl?: string | null;
     // videoUrl?: string | null;
