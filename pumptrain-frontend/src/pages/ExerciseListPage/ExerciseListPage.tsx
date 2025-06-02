@@ -1,37 +1,30 @@
-import React, { useState, useMemo, ChangeEvent, FormEvent } from "react";
+import React, { useState, useMemo, ChangeEvent } from "react";
 
 import {
     Box, Typography, Card, CardContent, Grid, Chip, Pagination,
     Container, Tabs, Tab, useMediaQuery, useTheme, TextField,
     InputAdornment, FormControl, Select, MenuItem as SelectMenuItem,
-    Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, CircularProgress,
+    Alert, CircularProgress,
     alpha,
     IconButton,
     SelectChangeEvent,
-    FormLabel
+    Button, Dialog, DialogTitle, DialogContent, DialogActions, Skeleton
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
-import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { AxiosError } from 'axios';
+import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 // Hooks e Tipos
 import { useExercisesQuery } from '../../hooks/useExercisesQuery';
-import { useCreateExerciseMutation } from '../../hooks/useCreateExerciseMutation';
 import { useDeleteExerciseMutation } from '../../hooks/useDeleteExerciseMutation';
 import { Exercise } from "../../types/exercise";
 import { useAuth } from "../../context/AuthContext";
 import { a11yProps, TabPanelProps } from "../../utils/uiHelpers";
 
-// Interface para a resposta de erro da API
-interface ApiErrorResponse {
-    timestamp?: string; status?: number; error?: string;
-    message?: string; path?: string;
-    fieldErrors?: Array<{ field: string; message: string }>;
-}
-
-// --- Componente TabPanel  ---
+// --- Componente TabPanel ---
 function TabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
     return ( <div role="tabpanel" hidden={value !== index} id={`exercise-tabpanel-${index}`} aria-labelledby={`exercise-tab-${index}`} {...other}> {value === index && <Box sx={{ pt: 3, px: {xs: 0, sm: 1} }}>{children}</Box>} </div> );
@@ -48,18 +41,32 @@ const exerciseTypes = [
 ];
 // --- Fim Dados Estáticos para Filtros ---
 
+// --- FUNÇÕES AUXILIARES PARA IMAGENS E MAPAS ---
+const normalizeStringForFilename = (str: string): string => {
+    if (!str) return 'default-key';
+    return str
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, '-')
+        .replace(/[/\\?%*:|"<>(),]/g, '');
+};
+
+const basePath = '/assets/images/';
+const ultimateDefaultLocalImage = `${basePath}default-exercise.png`;
+
+
 // --- Componente ExerciseCard ---
 interface ExerciseCardProps {
     exercise: Exercise;
     onDeleteRequest: (exercise: Exercise) => void;
-    onClick?: (exercise: Exercise) => void;
 }
 const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onDeleteRequest }) => {
     const theme = useTheme();
     const { isAuthenticated } = useAuth();
 
     const getTypeColor = (type?: string): string => {
-        switch (type?.toLowerCase()) {
+        const lowerType = type?.toLowerCase();
+        switch (lowerType) {
             case "strength": return theme.palette.error.main;
             case "cardio": return theme.palette.info.main;
             case "flexibility": return theme.palette.success.main;
@@ -67,7 +74,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onDeleteRequest }
         }
     };
     const getTypeLabel = (type?: string): string => {
-        switch (type?.toLowerCase()) {
+        const lowerType = type?.toLowerCase();
+        switch (lowerType) {
             case "strength": return "Força";
             case "cardio": return "Cardio";
             case "flexibility": return "Flexibilidade";
@@ -75,45 +83,122 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onDeleteRequest }
         }
     };
 
+    const getSmallExerciseTypeIcon = (exerciseType?: string) => {
+        const type = exerciseType?.toLowerCase();
+        const iconColor = getTypeColor(exerciseType);
+        switch (type) {
+            case "strength":
+                return <FitnessCenterIcon sx={{ color: iconColor, mr: 1, fontSize: '1.25rem' }} />;
+            case "cardio":
+                return <DirectionsRunIcon sx={{ color: iconColor, mr: 1, fontSize: '1.25rem' }} />;
+            case "flexibility":
+                return <SelfImprovementIcon sx={{ color: iconColor, mr: 1, fontSize: '1.25rem' }} />;
+            default:
+                return <HelpOutlineIcon sx={{ color: iconColor, mr: 1, fontSize: '1.25rem' }} />;
+        }
+    };
+
+// Chave: exercicio-normalizado. Valor: Nome exato do arquivo + extensão.
+    const exerciseNameImageMap: { [key: string]: string } = {
+        'supino-reto-com-barra': 'supino-reto.png',
+        'corrida-na-esteira': 'esteira.png',
+        'agachamento-livre-com-barra': 'agachamento-livre.png',
+        'levantamento-terra': 'levantamento-terra.png',
+        'rosca-direta-com-barra': 'rosca-direta.png',
+        'desenvolvimento-militar-com-barra': 'desenvolvimento-militar.png',
+        'barra-fixa-pull-up': 'barra-fixa.png',
+        'afundo-lunge': 'afundo.png',
+        'prancha-abdominal-plank': 'prancha.png',
+        'bicicleta-ergometrica': 'bicicleta.png',
+        'remada-curvada-com-barra': 'remada-curvada.png',
+        'triceps-testa-com-barra': 'triceps-testa.png',
+        'pular-corda': 'corda.png',
+        'flexao-de-braco-push-up': 'flexao.png',
+        'eliptico-transport': 'eliptico.png',
+    };
+
+// Função para buscar imagem baseada APENAS no NOME do exercício
+    const getExercisePreviewImagePathByName = (
+        exerciseName?: string | null
+    ): string => {
+        // console.log(`[getExercisePreviewImagePathByName] Tentando para o nome: ${exerciseName}`);
+
+        if (!exerciseName || exerciseName.trim() === '') {
+            // console.log(`[getExercisePreviewImagePathByName] Nome não fornecido, usando imagem default: ${ultimateDefaultLocalImage}`);
+            return ultimateDefaultLocalImage;
+        }
+
+        const normalizedExerciseName = normalizeStringForFilename(exerciseName);
+
+        if (exerciseNameImageMap[normalizedExerciseName]) {
+            const imageName = exerciseNameImageMap[normalizedExerciseName];
+            // console.log(`[getExercisePreviewImagePathByName] Nome '${normalizedExerciseName}' mapeado para imagem: ${imageName}`);
+            return `${basePath}${imageName}`;
+        }
+
+        // console.log(`[getExercisePreviewImagePathByName] Nome de exercício '${normalizedExerciseName}' não mapeado, usando imagem default: ${ultimateDefaultLocalImage}`);
+        return ultimateDefaultLocalImage;
+    };
+
+    const imagePath = getExercisePreviewImagePathByName(exercise.name);
+
     return (
         <Card
             sx={{
-                height: "100%", display: "flex", flexDirection: "column", borderRadius: 2,
+                height: "100%", display: "flex", flexDirection: "column", borderRadius: 1,
                 border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
                 transition: "all 0.2s ease-in-out",
                 "&:hover": { transform: "translateY(-4px)", boxShadow: theme.shadows[6], borderColor: theme.palette.primary.main }
             }}
-            // onClick={() => onClick?.(exercise)} // Se implementar visualização de detalhes
         >
             <Box
                 sx={{
                     height: 180,
-                    backgroundImage: `url(${exercise.imageUrl || `https://via.placeholder.com/300x180/${theme.palette.background.paper.replace('#','')}/${theme.palette.primary.main.replace('#','')}?text=${encodeURIComponent(exercise.name)}`})`,
-                    backgroundSize: "cover", backgroundPosition: "center", position: "relative",
-                    borderTopLeftRadius: theme.shape.borderRadius, borderTopRightRadius: theme.shape.borderRadius
+                    backgroundImage: `url(${imagePath})`,
+                    backgroundSize: "cover",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                    backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                    position: "relative",
+                    borderTopLeftRadius: theme.shape.borderRadius,
+                    borderTopRightRadius: theme.shape.borderRadius,
                 }}
             >
-                {exercise.type && (
-                    <Chip label={getTypeLabel(exercise.type)} size="small"
-                          sx={{ position: "absolute", top: 12, right: 12,
-                              backgroundColor: alpha(getTypeColor(exercise.type), 0.7),
-                              color: theme.palette.getContrastText(getTypeColor(exercise.type)),
-                              fontWeight: "bold", borderRadius: "4px" }} />
+                {exercise.exerciseType && (
+                    <Chip
+                        label={getTypeLabel(exercise.exerciseType)}
+                        size="small"
+                        sx={{
+                            position: "absolute", top: 12, right: 12,
+                            backgroundColor: alpha(getTypeColor(exercise.exerciseType), 0.85),
+                            color: theme.palette.getContrastText(getTypeColor(exercise.exerciseType)),
+                            fontWeight: "bold", borderRadius: "4px",
+                        }}
+                    />
                 )}
             </Box>
             <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column", p: 2 }}>
-                <Typography variant="h6" component="h3" fontWeight="bold" gutterBottom noWrap title={exercise.name}>
-                    {exercise.name}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    {getSmallExerciseTypeIcon(exercise.exerciseType)}
+                    <Typography variant="h6" component="h3" fontWeight="bold" gutterBottom noWrap title={exercise.name}>
+                        {exercise.name}
+                    </Typography>
+                </Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
                     Grupo: {exercise.muscleGroup}
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 1, mb: 2, flexGrow: 1, overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>
                     {exercise.description || "Sem descrição."}
                 </Typography>
+
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: "auto", pt:1 }}>
-                    {exercise.equipment && (<Chip label={exercise.equipment} size="small" variant="outlined" /> )}
+                    {/* Chip para Equipamento */}
+                    {exercise.equipment && (
+                        <Chip label={exercise.equipment} size="small" variant="outlined" />
+                    )}
                 </Box>
+
+
                 {isAuthenticated() && (
                     <Box sx={{mt: 1.5, display: 'flex', justifyContent: 'flex-end'}}>
                         <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDeleteRequest(exercise); }} color="error" aria-label={`Deletar ${exercise.name}`} title="Deletar">
@@ -126,7 +211,6 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onDeleteRequest }
     );
 };
 // --- Fim ExerciseCard ---
-
 
 // --- Componente Principal ---
 const ExerciseListPage: React.FC = () => {
@@ -141,14 +225,8 @@ const ExerciseListPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const { data: allExercises = [], isLoading: isLoadingExercises, isError: isFetchError, error: fetchErrorData } = useExercisesQuery();
-    const createExerciseMutation = useCreateExerciseMutation();
     const deleteExerciseMutation = useDeleteExerciseMutation();
 
-    const [openAddDialog, setOpenAddDialog] = useState<boolean>(false);
-    const [newExerciseData, setNewExerciseData] = useState<Partial<Omit<Exercise, 'id'>>>({
-        name: '', description: '', muscleGroup: 'Outro', equipment: '', type: 'strength', imageUrl: ''
-    });
-    const [addDialogError, setAddDialogError] = useState<string | null>(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
     const [exerciseToDelete, setExerciseToDelete] = useState<Exercise | null>(null);
 
@@ -160,7 +238,7 @@ const ExerciseListPage: React.FC = () => {
             const nameMatch = exercise.name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? true;
             const groupMatch = selectedMuscleGroup === "all" || exercise.muscleGroup === selectedMuscleGroup;
             const currentTabValue = exerciseTypes[tabValue]?.value;
-            const typeMatch = currentTabValue === "all" || exercise.type?.toLowerCase() === currentTabValue.toLowerCase();
+            const typeMatch = currentTabValue === "all" || exercise.exerciseType?.toLowerCase() === currentTabValue.toLowerCase();
             return nameMatch && groupMatch && typeMatch;
         });
     }, [allExercises, searchTerm, selectedMuscleGroup, tabValue]);
@@ -174,71 +252,43 @@ const ExerciseListPage: React.FC = () => {
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => { setTabValue(newValue); setCurrentPage(1); };
     const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => { setSearchTerm(event.target.value); setCurrentPage(1); };
-    const handleMuscleGroupChange = (event: SelectChangeEvent<string>) => { setSelectedMuscleGroup(event.target.value as string); setCurrentPage(1); };
+    const handleMuscleGroupChange = (event: SelectChangeEvent
+    ) => { setSelectedMuscleGroup(event.target.value as string); setCurrentPage(1); };
     const handlePageChange = (_event: ChangeEvent<unknown>, value: number) => { setCurrentPage(value); window.scrollTo({ top: 0, behavior: "smooth" }); };
-
-    const handleOpenAddDialog = () => { setOpenAddDialog(true); setAddDialogError(null); };
-    const handleCloseAddDialog = () => { setOpenAddDialog(false); setNewExerciseData({ name: '', description: '', muscleGroup: 'Outro', equipment: '', type: 'strength', imageUrl: '' }); };
-    const handleNewExerciseDataChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>) => {
-        const { name, value } = event.target as { name?: string; value: unknown };
-        if (name) {
-            setNewExerciseData(prev => ({ ...prev, [name]: value as string }));
-        }
-    };
-
-    const handleAddExerciseSubmit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (!newExerciseData.name?.trim() || !newExerciseData.muscleGroup?.trim()) {
-            setAddDialogError('Nome e Grupo Muscular são obrigatórios.'); return;
-        }
-        createExerciseMutation.mutate(newExerciseData as Omit<Exercise, 'id'>, {
-            onSuccess: () => handleCloseAddDialog(),
-            onError: (err) => {
-                const axiosErr = err as AxiosError<ApiErrorResponse>;
-                setAddDialogError(axiosErr.response?.data?.message || axiosErr.message || "Erro ao criar exercício");
-            }
-        });
-    };
 
     const handleOpenDeleteDialog = (exercise: Exercise) => { setExerciseToDelete(exercise); setOpenDeleteDialog(true); };
     const handleCloseDeleteDialog = () => { if(deleteExerciseMutation.isPending) return; setOpenDeleteDialog(false); setTimeout(() => setExerciseToDelete(null), 150);};
-    const handleDeleteExerciseSubmit = async () => {
-        if (!exerciseToDelete) return;
-        deleteExerciseMutation.mutate(exerciseToDelete.id, {
-            onSuccess: () => handleCloseDeleteDialog(),
-        });
-    };
+    const handleDeleteExerciseSubmit = async () => {if (!exerciseToDelete) return; deleteExerciseMutation.mutate(exerciseToDelete.id, {onSuccess: () => handleCloseDeleteDialog(),});};
 
     return (
         <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-                <Box>
-                    <Typography variant="h4" fontWeight="bold" sx={{ mb: 0.5 }}> Biblioteca de Exercícios </Typography>
-                    <Typography variant="body2" color="text.secondary"> Explore e gerencie os exercícios </Typography>
-                </Box>
-                {isAuthenticated() && (
-                    <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAddDialog}> Novo Exercício </Button>
-                )}
+            <Box sx={{ mb: 3, textAlign: { xs: 'center', sm: 'left' } }}>
+                <Typography variant="h4" fontWeight="bold" sx={{ mb: 0.5 }}> Biblioteca de Exercícios </Typography>
+                <Typography variant="body2" color="text.secondary"> Explore e gerencie seus exercícios </Typography>
             </Box>
 
             <Box sx={{ mb: 4 }}>
                 <Grid container spacing={2} alignItems="center">
-                    <Grid size={{ xs: 12, md: isTablet && !isAuthenticated() ? 12 : 7, lg: isAuthenticated() ? 8: 9 }}>
-                        <TextField fullWidth placeholder="Buscar por nome..." value={searchTerm} onChange={handleSearchChange}
-                                   slotProps={{ input:
-                                           {startAdornment: (
-                                               <InputAdornment
-                                                   position="start">
-                                                   <SearchIcon
-                                               sx={{color: "text.secondary"}}/>
-                                               </InputAdornment>),
-                                       }}}
-                                   sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2, bgcolor: alpha(theme.palette.action.hover, 0.5) }, }}
+                    <Grid size={{xs: 12, md: 8, lg: 9}}>
+                        <TextField
+                            fullWidth
+                            placeholder="Buscar por nome..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            slotProps={{ input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon sx={{color: "text.secondary"}}/>
+                                        </InputAdornment>
+                                    ),
+                                }
+                            }}
+                            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 1, bgcolor: alpha(theme.palette.background.default, 0.5) } }}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3, lg: isAuthenticated() ? 2 : 3 }}>
+                    <Grid size={{xs: 12, md: 4, lg: 3}}>
                         <FormControl fullWidth>
-                            <Select value={selectedMuscleGroup} onChange={handleMuscleGroupChange} displayEmpty sx={{ borderRadius: 2, bgcolor: alpha(theme.palette.action.hover, 0.5) }} >
+                            <Select value={selectedMuscleGroup} onChange={handleMuscleGroupChange} displayEmpty sx={{ borderRadius: 1, bgcolor: alpha(theme.palette.background.default, 0.5) }} >
                                 {muscleGroups.map((group) => ( <SelectMenuItem key={group} value={group === "Todos" ? "all" : group}>{group}</SelectMenuItem> ))}
                             </Select>
                         </FormControl>
@@ -256,8 +306,8 @@ const ExerciseListPage: React.FC = () => {
             {isLoadingExercises ? (
                 <Grid container spacing={3}>
                     {Array.from(new Array(exercisesPerPage)).map((_, index) => (
-                        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={`skel-${index}`}>
-                            {/* Skeleton do Card */}
+                        <Grid size={{xs: 12, sm: 6, md: 4, lg: 3}} key={`skel-${index}`}>
+                            <Skeleton variant="rounded" sx={{ height: 340, borderRadius: 1 }}/>
                         </Grid>
                     ))}
                 </Grid>
@@ -270,7 +320,7 @@ const ExerciseListPage: React.FC = () => {
                             {currentExercisesOnPage.length > 0 ? (
                                 <Grid container spacing={{xs: 2, sm: 3}}>
                                     {currentExercisesOnPage.map((exercise) => (
-                                        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={exercise.id}>
+                                        <Grid size={{xs: 12, sm: 6, md: 4, lg: 3}} key={exercise.id}>
                                             <ExerciseCard exercise={exercise} onDeleteRequest={handleOpenDeleteDialog} />
                                         </Grid>
                                     ))}
@@ -292,33 +342,8 @@ const ExerciseListPage: React.FC = () => {
                 </>
             )}
 
-            {/* Dialog Adicionar Exercício */}
-            <Dialog open={openAddDialog} onClose={handleCloseAddDialog} fullWidth maxWidth="sm">
-                <DialogTitle>Adicionar Novo Exercício</DialogTitle>
-                <Box component="form" onSubmit={handleAddExerciseSubmit}>
-                    <DialogContent>
-                        {addDialogError && <Alert severity="error" sx={{ mb: 2 }}>{addDialogError}</Alert>}
-                        <TextField autoFocus margin="dense" name="name" label="Nome do Exercício" fullWidth value={newExerciseData.name || ''} onChange={handleNewExerciseDataChange} required disabled={createExerciseMutation.isPending} />
-                        <TextField margin="dense" name="muscleGroup" label="Grupo Muscular" fullWidth value={newExerciseData.muscleGroup || ''} onChange={handleNewExerciseDataChange} required disabled={createExerciseMutation.isPending} />
-                        <TextField margin="dense" name="equipment" label="Equipamento" fullWidth value={newExerciseData.equipment || ''} onChange={handleNewExerciseDataChange} disabled={createExerciseMutation.isPending} />
-                        <TextField margin="dense" name="description" label="Descrição" fullWidth multiline rows={3} value={newExerciseData.description || ''} onChange={handleNewExerciseDataChange} disabled={createExerciseMutation.isPending} />
-                        <FormControl fullWidth margin="dense" disabled={createExerciseMutation.isPending}>
-                            <FormLabel component="legend" sx={{fontSize: '0.8rem', mb: 0.5}}>Tipo de Exercício</FormLabel>
-                            <Select name="type" value={newExerciseData.type || 'strength'} onChange={handleNewExerciseDataChange as never /* TODO: Type Select onChange properly */}>
-                                {exerciseTypes.filter(et => et.value !== 'all').map(et => <SelectMenuItem key={et.value} value={et.value}>{et.label}</SelectMenuItem>)}
-                            </Select>
-                        </FormControl>
-                        <TextField margin="dense" name="imageUrl" label="URL da Imagem" type="url" fullWidth value={newExerciseData.imageUrl || ''} onChange={handleNewExerciseDataChange} disabled={createExerciseMutation.isPending} />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleCloseAddDialog} disabled={createExerciseMutation.isPending}>Cancelar</Button>
-                        <Button type="submit" variant="contained" disabled={createExerciseMutation.isPending}> {createExerciseMutation.isPending ? <CircularProgress size={24} /> : 'Salvar'} </Button>
-                    </DialogActions>
-                </Box>
-            </Dialog>
 
-            {/* Dialog Confirmar Exclusão */}
-            {exerciseToDelete && (
+            {isAuthenticated() && exerciseToDelete && (
                 <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
                     <DialogTitle>Confirmar Exclusão</DialogTitle>
                     <DialogContent> <Typography>Tem certeza que deseja excluir o exercício "{exerciseToDelete.name}"?</Typography> </DialogContent>

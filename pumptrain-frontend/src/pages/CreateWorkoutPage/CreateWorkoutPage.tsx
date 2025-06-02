@@ -1,127 +1,80 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { styled } from "@mui/material/styles"
-
-// MUI Components
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTheme, alpha } from "@mui/material/styles";
 import {
-    Container,
-    Typography,
-    TextField,
-    Button,
-    Box,
-    Paper,
-    Stack,
-    Autocomplete,
-    CircularProgress,
-    List,
-    IconButton,
-    Grid,
-    Card,
-    CardContent,
-    InputAdornment,
-    Chip,
-} from "@mui/material"
-
-
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-
-// Icons
+    Typography, TextField, Button, Box, Stack,
+    Autocomplete, CircularProgress, IconButton, Grid,
+    InputAdornment, Chip, useMediaQuery, Fade, Divider,
+} from "@mui/material";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {
-    FitnessCenter as DumbbellIcon,
-    Add as AddIcon,
-    Delete as DeleteIcon,
-    Save as SaveIcon,
-    AccessTime as TimeIcon,
-    Notes as NotesIcon,
-} from "@mui/icons-material"
+    FitnessCenter as DumbbellIcon, Add as AddIcon, Delete as DeleteIcon,
+    Save as SaveIcon, AccessTime as TimeIcon, Notes as NotesIcon, ArrowBack as BackIcon,
+    Repeat as RepeatIcon, MonitorWeight as MonitorWeightIcon,
+    DirectionsRun as DirectionsRunIcon, Whatshot as WhatshotIcon, TrendingUp as TrendingUpIcon, CalendarToday as CalendarIcon
+} from "@mui/icons-material";
 
-// Hooks, Tipos, etc.
-import { useExercisesQuery } from '../../hooks/useExercisesQuery'
-import { useCreateWorkoutMutation } from '../../hooks/useCreateWorkoutMutation'
-import { Exercise } from '../../types/exercise'
-import { Activity } from '../../types/activity'
-import dayjs, { Dayjs } from 'dayjs'
-
-// --- Componentes estilizados ---
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(3),
-    backgroundColor: "#0a0b14",
-    borderRadius: theme.shape.borderRadius,
-    border: "1px solid rgba(119, 204, 136, 0.1)",
-    color: "#fffffc",
-}))
-
-const ActivityCard = styled(Card)(({ theme }) => ({
-    marginBottom: theme.spacing(2),
-    backgroundColor: "#0a0b14",
-    border: "1px solid rgba(119, 204, 136, 0.1)",
-    transition: "all 0.2s ease-in-out",
-    "&:hover": {
-        borderColor: "rgba(119, 204, 136, 0.3)",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    },
-}))
-
-const StyledChip = styled(Chip)<{ chipType?: 'strength' | 'cardio' | string | undefined }>(({chipType }) => {
-    let color = "#77cc88"
-    if (chipType === 'strength') color = "#cc7777";
-    else if (chipType === 'cardio') color = "#77aabb";
-
-    return {
-        backgroundColor: `${color}20`,
-        color: color,
-        fontWeight: "medium",
-        border: `1px solid ${color}40`,
-    }
-})
+import { useExercisesQuery } from '../../hooks/useExercisesQuery';
+import { useCreateWorkoutMutation, type CreateWorkoutPayload } from '../../hooks/useCreateWorkoutMutation';
+import { Exercise } from '../../types/exercise';
+import type { Activity } from '../../types/activity';
+import dayjs, { Dayjs } from 'dayjs';
+import {ActivityEntryBox, HeaderActions, HeaderTitle, PageHeader, StyledChipDetail, StyledPaper } from '../../utils/uiHelpers.tsx';
 
 // --- Tipos ---
 interface CurrentActivityState {
-    exercise: Exercise | null
-    sets: string
-    reps: string
-    durationMinutes: string
-    distanceKm: string
-    intensityLevel: string
-    inclinePercent: string
-    caloriesBurned: string
-    weight: string
-    notes: string
+    exercise: Exercise | null;
+    sets: string; reps: string; weight: string; notes: string;
+    durationMinutes: string; distanceKm: string; intensity: string;
+    incline: string;
 }
 
-// --- Componente principal ---
+type DisplayActivity = Omit<Activity, 'id' | 'workoutSessionId' | 'exerciseName'> & {
+    exerciseName: string,
+    exerciseType?: Exercise['exerciseType']
+};
+
+
 const CreateWorkoutPage: React.FC = () => {
-    const navigate = useNavigate()
-    const { data: exercises, isLoading: isLoadingExercises } = useExercisesQuery()
-    const createWorkout = useCreateWorkoutMutation()
-    // const theme = useTheme(); // Available if needed
+    const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+    const { data: exercises = [], isLoading: isLoadingExercises } = useExercisesQuery();
+    const createWorkoutMutation = useCreateWorkoutMutation();
 
-    const [sessionDate, setSessionDate] = useState<Dayjs | null>(dayjs())
-    const [workoutName, setWorkoutName] = useState<string>('')
-    const [workoutNotes, setWorkoutNotes] = useState<string>('')
-
-    type DisplayActivity = Omit<Activity, 'id' | 'workoutSessionId'> & { exerciseName: string, exerciseType?: 'strength' | 'cardio' | string };
-    const [addedActivities, setAddedActivities] = useState<DisplayActivity[]>([])
+    const [sessionDate, setSessionDate] = useState<Dayjs | null>(dayjs());
+    const [workoutName, setWorkoutName] = useState<string>('');
+    const [workoutNotes, setWorkoutNotes] = useState<string>('');
+    const [addedActivities, setAddedActivities] = useState<DisplayActivity[]>([]);
 
     const initialActivityState: CurrentActivityState = {
-        exercise: null,
-        sets: '',
-        reps: '',
-        weight: '',
-        notes: '',
-        durationMinutes: '',
-        distanceKm: '',
-        intensityLevel: '',
-        inclinePercent: '',
-        caloriesBurned: ''
-    }
-    const [currentActivity, setCurrentActivity] = useState<CurrentActivityState>(initialActivityState)
+        exercise: null, sets: '', reps: '', weight: '', notes: '',
+        durationMinutes: '', distanceKm: '', intensity: '',
+        incline: ''
+    };
+    const [currentActivity, setCurrentActivity] = useState<CurrentActivityState>(initialActivityState);
+
+    const inputStyles = {
+        '& .MuiOutlinedInput-root': {
+            backgroundColor: 'transparent',
+            '& fieldset': { borderColor: 'rgba(119, 204, 136, 0.3)' },
+            '&:hover fieldset': { borderColor: 'rgba(119, 204, 136, 0.6)' },
+            '&.Mui-focused fieldset': { borderColor: '#77cc88' },
+            '&.Mui-disabled': { backgroundColor: alpha(theme.palette.common.black, 0.15) }
+        },
+        '& .MuiInputBase-input': { color: '#f0f0f0', '&.Mui-disabled': { color: alpha(theme.palette.text.secondary, 0.5), WebkitTextFillColor: alpha(theme.palette.text.secondary, 0.5),}},
+        '& .MuiInputLabel-root': { color: 'rgba(240, 240, 240, 0.7)', '&.Mui-disabled': { color: alpha(theme.palette.text.secondary, 0.5) } },
+        '& .MuiInputLabel-root.Mui-focused': { color: '#77cc88' },
+        '& .MuiFormHelperText-root': { color: 'rgba(240, 240, 240, 0.6)', '&.Mui-error': { color: theme.palette.error.light }}
+    };
+
+
+    const adornmentIconColor = "rgba(119, 204, 136, 0.7)";
 
     const handleAddActivity = () => {
-        if (!currentActivity.exercise || !sessionDate) {
-            console.error("Selecione um exercício e data")
-            return
+        if (!currentActivity.exercise) {
+            console.error("Selecione um exercício.");
+            return;
         }
         const newActivity: DisplayActivity = {
             exerciseId: currentActivity.exercise.id,
@@ -132,308 +85,397 @@ const CreateWorkoutPage: React.FC = () => {
             weightKg: currentActivity.weight ? parseFloat(currentActivity.weight) : null,
             durationMinutes: currentActivity.durationMinutes ? parseInt(currentActivity.durationMinutes, 10) : null,
             distanceKm: currentActivity.distanceKm ? parseFloat(currentActivity.distanceKm) : null,
-            intensityLevel: currentActivity.intensityLevel ? parseInt(currentActivity.intensityLevel, 10) : null,
-            inclinePercent: currentActivity.inclinePercent ? parseFloat(currentActivity.inclinePercent) : null,
+            intensity: currentActivity.intensity ? parseInt(currentActivity.intensity, 10) : null,
+            incline: currentActivity.incline ? parseFloat(currentActivity.incline) : null,
             notes: currentActivity.notes || null,
-        }
-        setAddedActivities(prev => [...prev, newActivity])
-        setCurrentActivity(initialActivityState)
-    }
+        };
+        setAddedActivities(prev => [...prev, newActivity]);
+        setCurrentActivity(initialActivityState);
+    };
 
     const handleRemoveActivity = (indexToRemove: number) => {
-        setAddedActivities(prev => prev.filter((_, index) => index !== indexToRemove))
-    }
+        setAddedActivities(prev => prev.filter((_, index) => index !== indexToRemove));
+    };
 
     const handleSubmitWorkout = (event: React.FormEvent) => {
-        event.preventDefault()
+        event.preventDefault();
         if (!sessionDate || addedActivities.length === 0) {
-            console.error("Selecione data e adicione pelo menos uma atividade.")
-            return
+            console.error("Selecione data e adicione pelo menos uma atividade.");
+            return;
         }
-        const payload = {
+        const payload: CreateWorkoutPayload = {
             sessionDate: sessionDate.format('YYYY-MM-DD'),
             name: workoutName || null,
             notes: workoutNotes || null,
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            activities: addedActivities.map(({ exerciseName, exerciseType, ...rest }) => rest),
-        }
-        createWorkout.mutate(payload, {
-            onSuccess: () => {
-                navigate('/dashboard')
-            }
-        })
-    }
+            activities: addedActivities.map(({ exerciseName, exerciseType, ...rest }) => ({ ...rest })),
+        };
 
-    const adornmentIconColor = "#77cc88";
+        console.log('[CreateWorkoutPage] Payload ANTES de enviar para API:', JSON.parse(JSON.stringify(payload)));
+
+
+        createWorkoutMutation.mutate(payload, {
+            onSuccess: () => { navigate('/dashboard'); }
+        });
+    };
 
     return (
-        <Container maxWidth="md" sx={{ py: 4, color: "#fffffc" }}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
-                <DumbbellIcon sx={{ color: "#77cc88", mr: 1.5, fontSize: "2.5rem" }} />
-                <Typography variant="h4" fontWeight="bold" component="h1" sx={{ color: "#fffffc" }}>
-                    Registrar Novo Treino
-                </Typography>
-            </Box>
-
-            <Box component="form" onSubmit={handleSubmitWorkout} noValidate>
-                <StyledPaper elevation={0} sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ color: "#77cc88", mb: 2 }}>
-                        Informações Gerais
-                    </Typography>
-                    <Stack spacing={2.5}>
-                        <DatePicker
-                            label="Data do Treino"
-                            value={sessionDate}
-                            onChange={(newValue) => setSessionDate(newValue)}
-                            format="DD/MM/YYYY"
-                            sx={{ maxWidth: 250 }}
-                            slotProps={{
-                                textField: {
-                                    required: true,
-                                    variant: "outlined",
-                                    InputProps: {
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <TimeIcon sx={{ color: adornmentIconColor }} />
-                                            </InputAdornment>
-                                        ),
-                                    },
-                                },
-                            }}
-                        />
-                        <TextField
-                            label="Nome do Treino"
-                            required
-                            fullWidth
-                            variant="outlined"
-                            value={workoutName}
-                            onChange={(e) => setWorkoutName(e.target.value)}
-                            placeholder="Ex: Treino de Hoje"
-                            slotProps={{ input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <DumbbellIcon sx={{color: adornmentIconColor}}/>
-                                        </InputAdornment>
-                                    ),
-                                }
-                            }}
-                        />
-                        <TextField
-                            label="Notas Gerais (Opcional)"
-                            fullWidth
-                            variant="outlined"
-                            multiline
-                            rows={3}
-                            value={workoutNotes}
-                            onChange={(e) => setWorkoutNotes(e.target.value)}
-                            placeholder="Alguma observação sobre o treino em geral?"
-                            slotProps={{ input: {
-                                    startAdornment: (
-                                        <InputAdornment position="start" sx={{mt: -7}}>
-                                            <NotesIcon sx={{color: adornmentIconColor}}/>
-                                        </InputAdornment>
-                                    ),
-                                }
-                            }}
-                        />
-                    </Stack>
-                </StyledPaper>
-
-                <StyledPaper elevation={0} sx={{ mb: 3 }}>
-                    <Typography variant="h6" gutterBottom sx={{ color: "#77cc88", mb: 2 }}>
-                        Adicionar Atividade
-                    </Typography>
-                    <Autocomplete
-                        options={exercises || []}
-                        getOptionLabel={(option) => option.name}
-                        value={currentActivity.exercise}
-                        onChange={(_event, newValue: Exercise | null) => {
-                            console.log("Exercício Selecionado:", newValue); // LINHA DE DEPURAÇÃO
-                            setCurrentActivity(() => ({ ...initialActivityState, exercise: newValue }))
-                        }}
-                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                        loading={isLoadingExercises}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Exercício"
-                                variant="outlined"
-                                placeholder="Digite para buscar um exercício"
-                                slotProps={{ input: {
-                                        ...params.InputProps,
-                                        endAdornment: (
-                                            <>
-                                                {isLoadingExercises ? <CircularProgress sx={{color: adornmentIconColor}}
-                                                                                        size={20}/> : null}
-                                                {params.InputProps.endAdornment}
-                                            </>
-                                        ),
+        <Fade in={true} timeout={500}>
+            <Box sx={{maxWidth: 1200, mx: "auto", py: 4, px: 2, color: "#fffffc"}}>
+                <PageHeader>
+                    <HeaderTitle>
+                        <Box sx={{
+                            bgcolor: "rgba(119, 204, 136, 0.1)",
+                            p: 1.5,
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                        }}>
+                            <DumbbellIcon sx={{color: "#77cc88", fontSize: isMobile ? "1.5rem" : "2rem"}}/>
+                        </Box>
+                        <Typography variant="h4" fontWeight="bold">
+                            Registrar Novo Treino
+                        </Typography>
+                    </HeaderTitle>
+                    <HeaderActions>
+                        <Button variant="outlined" onClick={() => navigate(-1)} startIcon={<BackIcon/>}
+                                sx={{
+                                    color: "#fffffc",
+                                    borderColor: "rgba(255, 255, 252, 0.2)",
+                                    "&:hover": {
+                                        borderColor: "rgba(255, 255, 252, 0.4)",
+                                        backgroundColor: "rgba(255, 255, 252, 0.05)"
                                     }
+                                }}>
+                            Voltar
+                        </Button>
+                    </HeaderActions>
+                </PageHeader>
+
+                <StyledPaper elevation={0}>
+                    <Box component="form" onSubmit={handleSubmitWorkout} noValidate>
+                        <Box sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            mb: 3,
+                            pb: 2,
+                            borderBottom: "1px solid rgba(119, 204, 136, 0.1)"
+                        }}>
+                            <TimeIcon sx={{color: "#77cc88"}}/>
+                            <Typography variant="h6" fontWeight="500">Informações Gerais</Typography>
+                        </Box>
+                        <Stack spacing={2.5} sx={{mb: 4}}>
+                            <DatePicker
+                                label="Data do Treino" value={sessionDate}
+                                onChange={(newValue) => setSessionDate(newValue)}
+                                format="DD/MM/YYYY"
+                                sx={{maxWidth: {xs: '100%', sm: 280}, ...inputStyles}}
+                                slotProps={{
+                                    textField: {
+                                        required: true, variant: "outlined", size: "small",
+                                        InputProps: {
+                                            startAdornment: (<InputAdornment position="start"><CalendarIcon
+                                                sx={{color: adornmentIconColor}}/></InputAdornment>)
+                                        },
+                                    },
                                 }}
                             />
+                            <TextField label="Nome do Treino (Opcional)" fullWidth variant="outlined" size="small"
+                                       value={workoutName} onChange={(e) => setWorkoutName(e.target.value)}
+                                       placeholder="Ex: Treino de Peito e Tríceps" sx={inputStyles}
+                                       slotProps={{ input : {
+                                               startAdornment: (<InputAdornment position="start"><DumbbellIcon
+                                                   sx={{color: adornmentIconColor}}/></InputAdornment>)
+                                           }
+                                       }}
+                            />
+                            <TextField label="Notas Gerais (Opcional)" fullWidth variant="outlined" size="small"
+                                       multiline rows={3} value={workoutNotes}
+                                       onChange={(e) => setWorkoutNotes(e.target.value)}
+                                       placeholder="Alguma observação sobre o treino em geral?" sx={inputStyles}
+                                       slotProps={{ input: {
+                                               startAdornment: (<InputAdornment position="start" sx={{
+                                                   pt: 1,
+                                                   alignSelf: 'flex-start'
+                                               }} ><NotesIcon sx={{color: adornmentIconColor}}/></InputAdornment>
+                                               )
+                                           }
+                                       }}
+                            />
+                        </Stack>
+
+                        <Box sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            mb: 2.5,
+                            pb: 2,
+                            borderBottom: "1px solid rgba(119, 204, 136, 0.1)"
+                        }}>
+                            <AddIcon sx={{color: "#77cc88"}}/>
+                            <Typography variant="h6" fontWeight="500">Adicionar Atividade</Typography>
+                        </Box>
+
+                        <Autocomplete
+                            options={exercises || []}
+                            getOptionLabel={(option: Exercise) => option.name}
+                            value={currentActivity.exercise}
+                            onChange={(_event, newValue: Exercise | null) => {
+                                setCurrentActivity(() => ({...initialActivityState, exercise: newValue}));
+                            }}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            loading={isLoadingExercises}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Exercício" variant="outlined" size="small"
+                                           placeholder="Digite para buscar um exercício"
+                                           sx={{...inputStyles, mb: currentActivity.exercise ? 1 : 2}}
+                                           slotProps={{ input: {
+                                                   ...params.InputProps,
+                                                   endAdornment: (<> {isLoadingExercises ?
+                                                       <CircularProgress sx={{color: "#f0f0f0"}}
+                                                                         size={20}/> : null} {params.InputProps.endAdornment} </>),
+                                               }
+                                           }}/>
+                            )}
+                        />
+
+                        {currentActivity.exercise && currentActivity.exercise.exerciseType?.toLowerCase() === 'strength' && (
+                            <Grid container spacing={2} sx={{mb: 2, mt: 0.5}}>
+                                <Grid size={{xs: 12, sm: 4, md: 4}}>
+                                    <TextField label="Séries" type="number" fullWidth variant="outlined" size="small"
+                                               value={currentActivity.sets}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   sets: e.target.value
+                                               }))}
+                                               sx={{...inputStyles, width: '100%'}} slotProps={{htmlInput: {min: 0}}}/>
+                                </Grid>
+                                <Grid size={{xs: 12, sm: 4, md: 4}}>
+                                    <TextField label="Repetições" type="number" fullWidth variant="outlined"
+                                               size="small" value={currentActivity.reps}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   reps: e.target.value
+                                               }))}
+                                               sx={{...inputStyles, width: '100%'}} slotProps={{htmlInput: {min: 0}}}/>
+                                </Grid>
+                                <Grid size={{xs: 12, sm: 4, md: 4}}>
+                                    <TextField label="Peso (kg)" type="number" fullWidth variant="outlined" size="small"
+                                               value={currentActivity.weight}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   weight: e.target.value
+                                               }))}
+                                               sx={{...inputStyles, width: '100%'}}
+                                               slotProps={{htmlInput: {step: 0.25, min: 0}}}/>
+                                </Grid>
+                            </Grid>
                         )}
-                        sx={{ mb: 2 }}
-                    />
 
-                    {currentActivity.exercise && currentActivity.exercise.exerciseType?.toLowerCase() === 'strength' && (
-                        <Grid container spacing={2} sx={{ mb: 2 }}>
-                            <Grid size={{ xs:12, sm:4, md:4}}> {/* Using 'size' prop as requested */}
-                                <TextField label="Séries" type="number" fullWidth variant="outlined" size="small" value={currentActivity.sets}
-                                           onChange={(e) => setCurrentActivity(prev => ({ ...prev, sets: e.target.value }))}
-                                           slotProps={{ htmlInput: { min: 0 } }} /> {/* Using slotProps.htmlInput */}
+                        {currentActivity.exercise && currentActivity.exercise.exerciseType?.toLowerCase() === 'cardio' && (
+                            <Grid container spacing={2} sx={{mb: 2, mt: 0.5}}>
+                                <Grid size={{xs: 6, sm: 6, md: 3}}>
+                                    <TextField label="Duração (min)" type="number" fullWidth variant="outlined"
+                                               size="small" value={currentActivity.durationMinutes}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   durationMinutes: e.target.value
+                                               }))}
+                                               sx={{...inputStyles, width: '100%'}} slotProps={{htmlInput: {min: 0}}}/>
+                                </Grid>
+                                <Grid size={{xs: 6, sm: 6, md: 3}}>
+                                    <TextField label="Distância (km)" type="number" fullWidth variant="outlined"
+                                               size="small" value={currentActivity.distanceKm}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   distanceKm: e.target.value
+                                               }))}
+                                               sx={{...inputStyles, width: '100%'}}
+                                               slotProps={{htmlInput: {step: 0.1, min: 0}}}/>
+                                </Grid>
+                                <Grid size={{xs: 6, sm: 6, md: 3}}>
+                                    <TextField label="Intensidade (1-10)" type="number" fullWidth variant="outlined"
+                                               size="small" value={currentActivity.intensity}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   intensity: e.target.value
+                                               }))}
+                                               sx={{...inputStyles, width: '100%'}}
+                                               slotProps={{htmlInput: {min: 1, max: 10, step: 1}}}/>
+                                </Grid>
+                                <Grid size={{xs: 6, sm: 6, md: 3}}>
+                                    <TextField label="Inclinação (%)" type="number" fullWidth variant="outlined"
+                                               size="small" value={currentActivity.incline}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   incline: e.target.value
+                                               }))}
+                                               sx={{...inputStyles, width: '100%'}}
+                                               slotProps={{htmlInput: {step: 0.5, min: 0}}}/>
+                                </Grid>
                             </Grid>
-                            <Grid size={{ xs:12, sm:4, md:4}}> {/* Using 'size' prop */}
-                                <TextField label="Repetições" type="number" fullWidth variant="outlined" size="small" value={currentActivity.reps}
-                                           onChange={(e) => setCurrentActivity(prev => ({ ...prev, reps: e.target.value }))}
-                                           slotProps={{ htmlInput: { min: 0 } }} /> {/* Using slotProps.htmlInput */}
-                            </Grid>
-                            <Grid size={{ xs:12, sm:4, md:4}}> {/* Using 'size' prop */}
-                                <TextField label="Peso (kg)" type="number" fullWidth variant="outlined" size="small" value={currentActivity.weight}
-                                           onChange={(e) => setCurrentActivity(prev => ({ ...prev, weight: e.target.value }))}
-                                           slotProps={{ htmlInput: { step: 0.25, min: 0 } }} /> {/* Using slotProps.htmlInput */}
-                            </Grid>
-                        </Grid>
-                    )}
+                        )}
 
-                    {currentActivity.exercise && currentActivity.exercise.exerciseType?.toLowerCase() === 'cardio' && (
-                        <Grid container spacing={2} sx={{ mb: 2 }}>
-                            <Grid size={{xs:6, sm:6, md:3}}>
-                                <TextField
-                                    label="Duração (min)"
-                                    type="number"
-                                    fullWidth
-                                    variant="outlined"
-                                    size="small"
-                                    value={currentActivity.durationMinutes}
-                                    onChange={(e) => setCurrentActivity(prev => ({ ...prev, durationMinutes: e.target.value }))}
-                                    slotProps={{ htmlInput: { min: 0 } }}
-                                />
+                        {currentActivity.exercise && (
+                            <Grid container spacing={2} alignItems="flex-end" sx={{mb: 2}}>
+                                <Grid size={{xs: 12}}>
+                                    <TextField label="Notas da Atividade (Opcional)" fullWidth variant="outlined"
+                                               size="small" multiline rows={2}
+                                               value={currentActivity.notes}
+                                               onChange={(e) => setCurrentActivity(prev => ({
+                                                   ...prev,
+                                                   notes: e.target.value
+                                               }))}
+                                               placeholder="Ex: Cadência controlada, observações..."
+                                               sx={inputStyles}
+                                    />
+                                </Grid>
+                                <Grid size={{xs: 12, sm: "auto"}}>
+                                    <Button variant="contained" startIcon={<AddIcon/>} onClick={handleAddActivity}
+                                            disabled={!currentActivity.exercise} fullWidth={isMobile}
+                                            sx={{
+                                                bgcolor: "#77cc88",
+                                                "&:hover": {bgcolor: "#66bb77"},
+                                                color: "#0a0b14",
+                                                height: '40px'
+                                            }}>
+                                        Adicionar
+                                    </Button>
+                                </Grid>
                             </Grid>
-                            <Grid size={{xs:6, sm:6, md:3}}>
-                                <TextField
-                                    label="Distância (km)"
-                                    type="number"
-                                    fullWidth
-                                    variant="outlined"
-                                    size="small"
-                                    value={currentActivity.distanceKm}
-                                    onChange={(e) => setCurrentActivity(prev => ({ ...prev, distanceKm: e.target.value }))}
-                                    slotProps={{ htmlInput: { step: 0.1, min: 0 } }}
-                                />
-                            </Grid>
-                            <Grid size={{xs:6, sm:6, md:3}}>
-                                <TextField
-                                    label="Intensidade (1-10)"
-                                    type="number"
-                                    fullWidth
-                                    variant="outlined"
-                                    size="small"
-                                    value={currentActivity.intensityLevel}
-                                    onChange={(e) => setCurrentActivity(prev => ({ ...prev, intensityLevel: e.target.value }))}
-                                    slotProps={{ htmlInput: { min: 1, max: 10, step: 1 } }}
-                                />
-                            </Grid>
-                            <Grid size={{xs:6, sm:6, md:3}}>
-                                <TextField
-                                    label="Inclinação (%)"
-                                    type="number"
-                                    fullWidth
-                                    variant="outlined"
-                                    size="small"
-                                    value={currentActivity.inclinePercent}
-                                    onChange={(e) => setCurrentActivity(prev => ({ ...prev, inclinePercent: e.target.value }))}
-                                    slotProps={{ htmlInput: { step: 0.5, min: 0 } }}
-                                />
-                            </Grid>
-                        </Grid>
-                    )}
+                        )}
 
-                    {currentActivity.exercise && (
-                        <Grid container spacing={2} alignItems="flex-start" sx={{ mb: 2 }}>
-                            <Grid size={{xs:12, sm:8, md:9}} > {/* Standard Grid item for this section */}
-                                <TextField label="Notas da Atividade (Opcional)" fullWidth variant="outlined" size="small" multiline rows={2}
-                                           value={currentActivity.notes}
-                                           onChange={(e) => setCurrentActivity(prev => ({ ...prev, notes: e.target.value }))}
-                                           placeholder="Ex: Cadência controlada, observações..."
-                                />
-                            </Grid>
-                            <Grid size={{xs:12, sm:4, md:3}}  sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                                <Button
-                                    variant="contained"
-                                    startIcon={<AddIcon />}
-                                    onClick={handleAddActivity}
-                                    disabled={!currentActivity.exercise}
-                                    fullWidth
-                                    sx={{ bgcolor: "#77cc88", "&:hover": { bgcolor: "#66bb77" }, height: '56px' }}
-                                >
-                                    Adicionar
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    )}
-                </StyledPaper>
-
-                {addedActivities.length > 0 && (
-                    <StyledPaper elevation={0} sx={{ mb: 3 }}>
-                        <Typography variant="h6" gutterBottom sx={{ color: "#77cc88", mb: 2 }}>
-                            Atividades Adicionadas ({addedActivities.length})
-                        </Typography>
-                        <List dense sx={{padding: 0}}>
-                            {addedActivities.map((activity, index) => (
-                                <React.Fragment key={index}>
-                                    <ActivityCard variant="outlined">
-                                        <CardContent>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                                                <Typography variant="subtitle1" fontWeight="medium" sx={{ color: "#fafafa" }}>
-                                                    {activity.exerciseName}
-                                                </Typography>
-                                                <StyledChip
-                                                    label={activity.exerciseType ? activity.exerciseType.charAt(0).toUpperCase() + activity.exerciseType.slice(1) : 'Detalhe'}
-                                                    size="small"
-                                                    chipType={activity.exerciseType}
-                                                />
-                                            </Box>
-                                            <Typography variant="body2" sx={{ color: "text.secondary", mb: 1.5, whiteSpace: 'pre-wrap' }}>
-                                                {
-                                                    (activity.exerciseType?.toLowerCase() === 'strength')
-                                                        ? `Séries: ${activity.sets ?? '-'} | Reps: ${activity.repetitions ?? '-'} | Peso: ${activity.weightKg ?? '-'} kg`
-                                                        : (activity.exerciseType?.toLowerCase() === 'cardio')
-                                                            ? `Duração: ${activity.durationMinutes ?? '-'} min | Dist: ${activity.distanceKm ?? '-'} km ${activity.intensityLevel ? `| Int: ${activity.intensityLevel}` : ''} ${activity.inclinePercent ? `| Incl: ${activity.inclinePercent}%` : ''}`
-                                                            : ''
-                                                }
+                        {addedActivities.length > 0 && (
+                            <>
+                                <Box sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    mb: 2,
+                                    mt: 4,
+                                    pb: 2,
+                                    borderBottom: "1px solid rgba(119, 204, 136, 0.1)"
+                                }}>
+                                    <DumbbellIcon sx={{color: "#77cc88"}}/>
+                                    <Typography variant="h6" fontWeight="500"> Atividades Adicionadas
+                                        ({addedActivities.length}) </Typography>
+                                </Box>
+                                {addedActivities.map((activity, index) => (
+                                    <ActivityEntryBox key={index}>
+                                        <Box sx={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'flex-start',
+                                            mb: 1.5
+                                        }}>
+                                            <Typography variant="subtitle1" fontWeight="medium"
+                                                        sx={{color: "#fafafa", flexGrow: 1, mr: 1}}>
+                                                {activity.exerciseName}
                                             </Typography>
-                                            {activity.notes && (
-                                                <Typography variant="caption" display="block" sx={{ color: "text.disabled", fontStyle: 'italic' }}>
-                                                    Nota: {activity.notes}
-                                                </Typography>
+                                            <Chip
+                                                label={activity.exerciseType ? activity.exerciseType.charAt(0).toUpperCase() + activity.exerciseType.slice(1) : 'Geral'}
+                                                size="small"
+                                                sx={{
+                                                    bgcolor: alpha(theme.palette.primary.main, activity.exerciseType === 'strength' ? 0.3 : activity.exerciseType === 'cardio' ? 0.2 : 0.1),
+                                                    color: theme.palette.primary.light,
+                                                    border: `1px solid ${alpha(theme.palette.primary.main, 0.4)}`,
+                                                    flexShrink: 0
+                                                }}
+                                            />
+                                            <IconButton edge="end" aria-label="delete"
+                                                        onClick={() => handleRemoveActivity(index)}
+                                                        sx={{
+                                                            color: "#cc7777",
+                                                            "&:hover": {color: alpha("#dd6666", 0.8)},
+                                                            ml: 1,
+                                                            p: 0.5
+                                                        }}>
+                                                <DeleteIcon fontSize="small"/>
+                                            </IconButton>
+                                        </Box>
+                                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{mb: 0.5}}>
+                                            {activity.exerciseType?.toLowerCase() === 'strength' && (
+                                                <>
+                                                    {activity.sets != null && (<StyledChipDetail icon={<RepeatIcon/>}
+                                                                                                 label={`Séries: ${activity.sets}`}
+                                                                                                 variant="outlined"
+                                                                                                 size="small"/>)}
+                                                    {activity.repetitions != null && (
+                                                        <StyledChipDetail icon={<DumbbellIcon/>}
+                                                                          label={`Reps: ${activity.repetitions}`}
+                                                                          variant="outlined" size="small"/>)}
+                                                    {activity.weightKg != null && (
+                                                        <StyledChipDetail icon={<MonitorWeightIcon/>}
+                                                                          label={`Peso: ${activity.weightKg} kg`}
+                                                                          variant="outlined" size="small"/>)}
+                                                </>
                                             )}
-                                            <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 1}}>
-                                                <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveActivity(index)} sx={{ color: "#cc7777", "&:hover": { color: "#dd6666" } }}>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Box>
-                                        </CardContent>
-                                    </ActivityCard>
-                                </React.Fragment>
-                            ))}
-                        </List>
-                    </StyledPaper>
-                )}
+                                            {activity.exerciseType?.toLowerCase() === 'cardio' && (
+                                                <>
+                                                    {activity.durationMinutes != null && (
+                                                        <StyledChipDetail icon={<TimeIcon/>}
+                                                                          label={`Tempo: ${activity.durationMinutes} min`}
+                                                                          variant="outlined" size="small"/>)}
+                                                    {activity.distanceKm != null && (
+                                                        <StyledChipDetail icon={<DirectionsRunIcon/>}
+                                                                          label={`Dist.: ${activity.distanceKm} km`}
+                                                                          variant="outlined" size="small"/>)}
+                                                    {activity.intensity != null && (
+                                                        <StyledChipDetail icon={<WhatshotIcon/>}
+                                                                          label={`Int.: ${activity.intensity}`}
+                                                                          variant="outlined" size="small"/>)}
+                                                    {activity.incline != null && (
+                                                        <StyledChipDetail icon={<TrendingUpIcon/>}
+                                                                          label={`Incl.: ${activity.incline}%`}
+                                                                          variant="outlined" size="small"/>)}
+                                                </>
+                                            )}
+                                            {activity.notes && (<StyledChipDetail icon={<NotesIcon/>} label="Nota"
+                                                                                  title={activity.notes}
+                                                                                  variant="outlined" size="small"/>)}
+                                        </Stack>
 
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        startIcon={<SaveIcon />}
-                        disabled={addedActivities.length === 0 || createWorkout.isPending || !sessionDate}
-                        sx={{ bgcolor: "#77cc88", "&:hover": { bgcolor: "#66bb77" }, color: "#0a0b14", fontWeight: 'bold' }}
-                    >
-                        {createWorkout.isPending ? <CircularProgress size={24} sx={{color: "#0a0b14"}} /> : 'Salvar Treino'}
-                    </Button>
-                </Box>
+                                        {index < addedActivities.length - 1 && (
+                                            <Divider
+                                                sx={{mt: theme.spacing(2.5), borderColor: 'rgba(119, 204, 136, 0.1)'}}/>
+                                        )}
+                                    </ActivityEntryBox>
+                                ))}
+                            </>
+                        )}
+
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            mt: addedActivities.length > 0 ? 3 : 4,
+                            pt: 3,
+                            borderTop: addedActivities.length > 0 ? "1px solid rgba(119, 204, 136, 0.1)" : "none"
+                        }}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                startIcon={createWorkoutMutation.isPending ?
+                                    <CircularProgress size={20} color="inherit"/> : <SaveIcon/>}
+                                disabled={addedActivities.length === 0 || createWorkoutMutation.isPending || !sessionDate}
+                                sx={{
+                                    bgcolor: "#77cc88",
+                                    "&:hover": {bgcolor: "#66bb77"},
+                                    color: "#0a0b14",
+                                    fontWeight: 'bold',
+                                    py: 1.2,
+                                    px: 3
+                                }}
+                            >
+                                {createWorkoutMutation.isPending ? 'Salvando...' : 'Salvar Treino'}
+                            </Button>
+                        </Box>
+                    </Box>
+                </StyledPaper>
             </Box>
-        </Container>
-    )
+        </Fade>
+    );
 }
 
-export default CreateWorkoutPage
+export default CreateWorkoutPage;

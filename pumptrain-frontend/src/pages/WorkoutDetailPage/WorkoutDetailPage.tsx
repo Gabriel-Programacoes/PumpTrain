@@ -207,7 +207,12 @@ const WorkoutDetailPage: React.FC = () => {
             {workout.activities && workout.activities.length > 0 ? (
                 <List disablePadding>
                     {workout.activities.map((activity: Activity, index) => (
-                        <Paper variant="outlined" sx={{ mb: 2, p: 2 }} key={activity.id ?? index}>
+                        ((() => {
+                            console.log(`[WorkoutDetailPage] Atividade ${index}:`, JSON.parse(JSON.stringify(activity)));
+                            return null; // IIFE não interfere no valor retornado pelo map principal
+                        })()), // A vírgula aqui permite que a próxima expressão (o Paper) seja o valor retornado pelo map
+
+                            <Paper variant="outlined" sx={{ mb: 2, p: 2 }} key={activity.id ?? index}>
                             <Typography variant="h6" component="div" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
                                 <FitnessCenterIcon sx={{ mr: 1, color: 'primary.main' }} />
                                 {/* Exibe ID do exercício. Implementar busca de nome será uma melhoria futura. */}
@@ -220,11 +225,10 @@ const WorkoutDetailPage: React.FC = () => {
                                 {activity.weightKg != null && <Chip icon={<MonitorWeightIcon />} label={`Peso: ${activity.weightKg} kg`} size="small" variant="outlined" />}
 
                                 {/* Campos de Cardio */}
-                                {activity.durationMinutes != null && <Chip icon={<TimerIcon />} label={`${activity.durationMinutes} min`} size="small" variant="outlined" />}
-                                {activity.distanceKm != null && <Chip icon={<DirectionsRunIcon />} label={`${activity.distanceKm} km`} size="small" variant="outlined" />}
-                                {activity.intensityLevel != null && <Chip icon={<WhatshotIcon />} label={`Intensidade ${activity.intensityLevel}`} size="small" variant="outlined" />}
-                                {activity.inclinePercent != null && <Chip icon={<TrendingUpIcon />} label={`${activity.inclinePercent}% incl.`} size="small" variant="outlined" />}
-
+                                {activity.durationMinutes != null && <Chip icon={<TimerIcon />} label={`Duração: ${activity.durationMinutes} min`} size="small" variant="outlined" />}
+                                {activity.distanceKm != null && <Chip icon={<DirectionsRunIcon />} label={`Distância: ${activity.distanceKm} km`} size="small" variant="outlined" />}
+                                {activity.intensity != null && <Chip icon={<WhatshotIcon />} label={`Intensidade: ${activity.intensity}`} size="small" variant="outlined" />}
+                                {activity.incline != null && <Chip icon={<TrendingUpIcon />} label={`Inclinação: ${activity.incline}%`} size="small" variant="outlined" />}
                             </Stack>
                             {activity.notes && ( <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}> <i>Nota: {activity.notes}</i> </Typography> )}
                         </Paper>
@@ -232,7 +236,7 @@ const WorkoutDetailPage: React.FC = () => {
                 </List>
             ) : ( <Typography sx={{ mt: 2 }}>Nenhuma atividade registrada.</Typography> )}
 
-            {/* Dialog de Confirmação de Deleção (Mantido) */}
+            {/* Dialog de Confirmação de Deleção */}
             <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog} aria-labelledby="delete-dialog-title">
                 <DialogTitle id="delete-dialog-title">Confirmar Deleção</DialogTitle>
                 <DialogContent><DialogContentText> Tem certeza que deseja deletar este treino? Esta ação não pode ser desfeita. </DialogContentText></DialogContent>

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Box } from '@mui/material';
+import {Box, Card, Chip, Paper} from '@mui/material';
 // Importe os ícones que mapIconNameToComponent pode retornar
 import {
     LocalFireDepartment as FireIcon,
@@ -13,9 +13,10 @@ import {
     Star as StarIcon,
     Lock as LockIcon,
     Share as ShareIcon,
-    Celebration as CelebrationIcon,// Ou CalendarMonth
+    Celebration as CelebrationIcon,
     // Adicione outros ícones que você usa aqui
 } from "@mui/icons-material";
+import {alpha, styled} from "@mui/material/styles";
 
 /**
  * Gera iniciais a partir de um nome.
@@ -95,3 +96,104 @@ export function a11yProps(index: number) {
         "aria-controls": `tabpanel-${index}`, // ID mais genérico
     };
 }
+
+export const StyledPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(3),
+    backgroundColor: "#0a0b14",
+    borderRadius: theme.spacing(1),
+    border: "1px solid rgba(119, 204, 136, 0.1)",
+    color: "#fffffc",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+    position: "relative",
+    overflow: "hidden",
+    "&::before": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "4px",
+        background: "linear-gradient(90deg, #77cc88 0%, rgba(119, 204, 136, 0.3) 100%)",
+    },
+}));
+
+export const ActivityCard = styled(Card)(({ theme }) => ({
+    marginBottom: theme.spacing(2),
+    backgroundColor: "#0a0b14",
+    border: "1px solid rgba(119, 204, 136, 0.1)",
+    transition: "all 0.2s ease-in-out",
+    "&:hover": {
+        borderColor: "rgba(119, 204, 136, 0.3)",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    },
+}))
+
+export const StyledChip = styled(Chip)<{ chipType?: 'strength' | 'cardio' | string | undefined }>(({chipType }) => {
+    let color = "#77cc88"
+    if (chipType === 'strength') color = "#cc7777";
+    else if (chipType === 'cardio') color = "#77aabb";
+
+    return {
+        backgroundColor: `${color}20`,
+        color: color,
+        fontWeight: "medium",
+        border: `1px solid ${color}40`,
+    }
+})
+
+export const PageHeader = styled(Box)(({ theme }) => ({
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: theme.spacing(4),
+    [theme.breakpoints.down("sm")]: {
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: theme.spacing(2),
+    },
+}));
+
+export const HeaderTitle = styled(Box)(({ theme }) => ({
+    display: "flex",
+    alignItems: "center",
+    gap: theme.spacing(1.5),
+}));
+
+export const HeaderActions = styled(Box)(({ theme }) => ({
+    display: "flex",
+    gap: theme.spacing(1.5),
+    [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        justifyContent: "space-between",
+    },
+}));
+
+export const DateChip = styled(Chip)(() => ({ // Adicionado theme para consistência, embora não usado aqui
+    backgroundColor: "rgba(255, 255, 252, 0.05)",
+    color: "#fffffc",
+    border: "1px solid rgba(255, 255, 252, 0.1)",
+    fontWeight: "medium",
+}));
+
+
+export const ActivityEntryBox = styled(Box)(({ theme }) => ({
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(1.5),
+}));
+
+export const StyledChipDetail = styled(Chip)(({ theme }) => ({
+    height: 'auto',
+    '& .MuiChip-label': {
+        paddingTop: '2px',
+        paddingBottom: '2px',
+        fontSize: '0.75rem'
+    },
+    '& .MuiChip-icon': {
+        marginLeft: '8px',
+        marginRight: '-4px',
+        fontSize: '1rem',
+    },
+    borderColor: alpha(theme.palette.primary.main, 0.4),
+    color: alpha(theme.palette.text.primary, 0.9),
+    backgroundColor: alpha(theme.palette.primary.main, 0.05)
+}));

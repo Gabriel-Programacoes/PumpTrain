@@ -72,7 +72,7 @@ const WorkoutImagePlaceholder = styled(Box)(({ theme }) => ({
 // --- Componente Principal ---
 const MyWorkoutsPage: React.FC = () => {
     const theme = useTheme();
-    const navigate = useNavigate(); // Hook para navegação
+    const navigate = useNavigate();
 
     // Estado para busca
     const [searchTerm, setSearchTerm] = useState("");
@@ -85,7 +85,7 @@ const MyWorkoutsPage: React.FC = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     // Hooks de dados e mutação
-    const { data: workouts = [], isLoading, isError} = useWorkoutsQuery(); // <<< Busca dados reais
+    const { data: workouts = [], isLoading, isError} = useWorkoutsQuery();
     const deleteMutation = useDeleteWorkoutMutation();
 
     // Handlers do Menu de Ações
@@ -100,11 +100,11 @@ const MyWorkoutsPage: React.FC = () => {
     };
 
     // Handlers do Dialog de Deleção
-    const handleDeleteRequest = () => { // Chamado pelo MenuItem
+    const handleDeleteRequest = () => {
         if (selectedWorkout) {
             setOpenDeleteDialog(true);
         }
-        handleMenuClose(); // Fecha o menu de ações
+        handleMenuClose();
     };
     const handleCloseDeleteDialog = () => {
         setOpenDeleteDialog(false);
@@ -131,7 +131,7 @@ const MyWorkoutsPage: React.FC = () => {
     };
 
     const handleViewDetails = (id: string | number) => {
-        navigate(`/workouts/${id}`); // Navega para a rota de detalhes
+        navigate(`/workouts/${id}`);
     };
 
     // Handler de Edição
@@ -149,14 +149,14 @@ const MyWorkoutsPage: React.FC = () => {
 
     // Filtragem (simplificada para buscar apenas pelo nome)
     const filteredWorkouts = workouts.filter((workout) =>
-        (workout.name || `Treino de ${formatDate(workout.sessionDate)}`) // Busca no nome ou na data formatada
+        (workout.name || `Treino de ${formatDate(workout.sessionDate)}`)
             .toLowerCase()
             .includes(searchTerm.toLowerCase())
     );
 
     // Handlers de Navegação
     const navigateToCreate = () => {
-        navigate('/workouts/new'); // Ajuste a rota se necessário
+        navigate('/workouts/new');
     }
 
     return (
@@ -176,16 +176,17 @@ const MyWorkoutsPage: React.FC = () => {
                 <TextField
                     fullWidth
                     variant="outlined"
-                    placeholder="Buscar treinos por nome ou data..." // Placeholder atualizado
+                    placeholder="Buscar treinos por nome ou data..."
                     value={searchTerm}
                     onChange={handleSearchChange}
                     size="small"
                     sx={{
                         flexGrow: 1,
                         "& .MuiOutlinedInput-root": {
-                            borderRadius: 2,
-                            backgroundColor: theme.palette.action.hover, // Usa cor do tema
-                            borderColor: theme.palette.divider, // Usa cor do tema
+                            borderRadius: 1,
+                            backgroundColor: theme.palette.background.default,
+                            borderColor: theme.palette.divider,
+                            height: 40,
                         },
                     }}
                     slotProps={{ input: {
@@ -197,14 +198,14 @@ const MyWorkoutsPage: React.FC = () => {
                         }
                     }}
                 />
-                <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1 }}> {/* Esconde botão maior em mobile */}
+                <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1 }}>
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}
                         onClick={navigateToCreate}
-                        sx={{width: "130%", borderRadius: 2 }} // Usa cor primária padrão do tema
+                        sx={{width: 150, height: 40, borderRadius: 1 }}
                     >
-                        Novo Treino
+                        Criar treino
                     </Button>
                 </Box>
             </Box>
@@ -242,14 +243,14 @@ const MyWorkoutsPage: React.FC = () => {
             {/* --- Fim Workout Grid --- */}
 
 
-            {/* Mobile FAB (funcional) */}
+            {/* Mobile FAB */}
             <Box sx={{ display: { xs: "block", sm: "none" }, position: "fixed", right: 16, bottom: 16 }}>
                 <Fab color="primary" aria-label="add" onClick={navigateToCreate}>
                     <AddIcon />
                 </Fab>
             </Box>
 
-            {/* Workout Menu (funcional) */}
+            {/* Workout Menu */}
             <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
@@ -262,17 +263,17 @@ const MyWorkoutsPage: React.FC = () => {
                         }
                     } }}
             >
-                <MenuItem onClick={handleEditRequest}> {/* <<< Chama handler Editar */}
+                <MenuItem onClick={handleEditRequest}>
                     <EditIcon fontSize="small" sx={{ mr: 1 }} />
                     Editar treino
                 </MenuItem>
-                <MenuItem onClick={handleDeleteRequest}> {/* <<< Chama handler Deletar */}
+                <MenuItem onClick={handleDeleteRequest}>
                     <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
                     Excluir treino
                 </MenuItem>
             </Menu>
 
-            {/* Dialog de Confirmação (igual aos anteriores) */}
+            {/* Dialog de Confirmação */}
             <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
                 <DialogTitle>Confirmar</DialogTitle>
                 <DialogContent><DialogContentText> Tem certeza que deseja deletar o treino "{selectedWorkout?.name}"? </DialogContentText></DialogContent>
@@ -291,7 +292,7 @@ const MyWorkoutsPage: React.FC = () => {
 
 // --- Componente WorkoutCard ---
 interface WorkoutCardProps {
-    workout: Workout; // <<< Usa seu tipo Workout
+    workout: Workout;
     onMenuOpen: (event: React.MouseEvent<HTMLElement>, workout: Workout) => void;
     onViewDetails: (id: string | number) => void;
 }
@@ -300,7 +301,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, onMenuOpen, onViewDe
     const theme = useTheme();
     return (
         <StyledCard>
-            <WorkoutImagePlaceholder> {/* Placeholder visual */}
+            <WorkoutImagePlaceholder>
                 <FitnessCenterIcon sx={{ fontSize: 50, color: theme.palette.primary.light }} />
             </WorkoutImagePlaceholder>
             <CardContent sx={{ p: 2, flexGrow: 1 }}>

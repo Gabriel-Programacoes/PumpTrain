@@ -65,12 +65,12 @@ export const createAppTheme = () =>
                 }
             },
             shape: {
-                borderRadius: 10, // Mantido
+                borderRadius: 10,
             },
             components: {
                 MuiAppBar: {
                     styleOverrides: {
-                        root: ({ theme }) => ({ // theme aqui é o tema sendo construído
+                        root: ({ theme }) => ({
                             backgroundColor: appBarDarkBackground, // Cor escura específica para AppBar
                             color: theme.palette.text.primary, // Usa a cor de texto primária definida
                             borderBottom: `1px solid ${theme.palette.divider}`, // Usa a cor de divisor definida

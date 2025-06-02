@@ -10,6 +10,8 @@ export interface CreateWorkoutPayload {
     name: string | null;
     notes: string | null;
     activities: Omit<Activity, 'id' | 'exerciseName'>[];
+    intensity?: number | null;
+    incline?: number | null;
 }
 
 export const useCreateWorkoutMutation = () => {

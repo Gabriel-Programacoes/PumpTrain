@@ -9,6 +9,8 @@ export interface UpdateWorkoutPayload {
     name: string | null;
     notes: string | null;
     activities: Array<Omit<Activity, 'id' | 'exerciseName'> & { id?: string | number }>;
+    intensity?: number | null;
+    incline?: number | null;
 }
 
 export const useUpdateWorkoutMutation = (workoutId: string | number | undefined) => {

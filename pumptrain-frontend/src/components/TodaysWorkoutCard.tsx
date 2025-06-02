@@ -39,7 +39,7 @@ export const TodaysWorkoutCard: React.FC<TodaysWorkoutCardProps> = ({ workout })
     return (
         <Card variant="outlined">
             <CardHeader
-                title="🔥 Treino do Dia"
+                title="🔥 BORA BOTAR PRA MOER!!"
                 slotProps={{ title: {variant: 'h6', fontWeight: 'bold'} }}
                 action={
                     workout.completedAt ? (
@@ -52,7 +52,7 @@ export const TodaysWorkoutCard: React.FC<TodaysWorkoutCardProps> = ({ workout })
                     {workout.name || `Treino de ${formatDate(workout.sessionDate, 'DD/MM/YYYY')}`}
                 </Typography>
                 {workout.notes && ( <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontStyle: 'italic' }}> {workout.notes} </Typography> )}
-                <Typography variant="subtitle1" gutterBottom sx={{fontWeight: 'medium'}}> Atividades: </Typography>
+                <Typography variant="subtitle1" gutterBottom sx={{fontWeight: 'medium'}}> Exercícios: </Typography>
                 {isLoadingExercises ? ( <Skeleton variant="rectangular" height={60} /> ) : (
                     <List dense disablePadding sx={{mb: 1}}>
                         {workout.activities.map((activity) => (
@@ -64,17 +64,14 @@ export const TodaysWorkoutCard: React.FC<TodaysWorkoutCardProps> = ({ workout })
                                         secondary={
                                             <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap" sx={{mt: 0.5}}>
                                                 {activity.sets != null && <Chip icon={<FitnessCenterIcon />} label={`Séries: ${activity.sets}`} size="small" variant="outlined" />}
-                                                {activity.repetitions != null && <Chip icon={<RepeatIcon />} label={`Repetições: ${activity.sets}`} size="small" variant="outlined" />}
+                                                {activity.repetitions != null && <Chip icon={<RepeatIcon />} label={`Repetições: ${activity.repetitions}`} size="small" variant="outlined" />}
                                                 {activity.weightKg != null && <Chip icon={<FitnessCenterIcon/>} label={`Peso: ${activity.weightKg} kg`} size="small" variant="outlined"/>}
                                                 {activity.notes && <Chip icon={<NotesIcon/>} label={`${activity.notes}`} size="small" variant="outlined" />}
 
-
-
-
                                                 {activity.durationMinutes != null && <Chip icon={<TimerIcon />} label={`Tempo: ${activity.durationMinutes} min`} size="small" variant="outlined" />}
                                                 {activity.distanceKm != null && <Chip icon={<DirectionsRunIcon />} label={`Distância: ${activity.distanceKm} km`} size="small" variant="outlined" />}
-                                                {activity.intensityLevel != null && <Chip icon={<WhatshotIcon />} label={`Intensidade: ${activity.intensityLevel}`} size="small" variant="outlined" />}
-                                                {activity.inclinePercent != null && <Chip icon={<TrendingUpIcon />} label={`Incl.:${activity.inclinePercent}%`} size="small" variant="outlined" />}
+                                                {activity.intensity != null && <Chip icon={<WhatshotIcon />} label={`Intensidade: ${activity.intensity}`} size="small" variant="outlined" />}
+                                                {activity.incline != null && <Chip icon={<TrendingUpIcon />} label={`Inclinação: ${activity.incline}%`} size="small" variant="outlined" />}
                                             </Stack>
                                         }
                                         slotProps={{primary: {fontWeight: 'medium', fontSize: '0.9rem'}}}
