@@ -16,5 +16,4 @@ public class ExerciseDto {
     private String muscleGroup;
     private String equipment;
     private ExerciseType exerciseType;
-
 }

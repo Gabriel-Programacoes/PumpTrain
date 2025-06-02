@@ -61,7 +61,36 @@ public class ExerciseService {
         log.info("Buscando todos os exercícios.");
         List<Exercise> exercises = exerciseRepository.findAll();
         log.debug("Encontrados {} exercícios.", exercises.size());
-        return exerciseMapper.toDto(exercises);
+
+        // --- INÍCIO DO LOG DE DEPURAÇÃO ---
+        log.info("Verificando valores da entidade Exercise ANTES do mapeamento para ExerciseDto:");
+        for (Exercise exerciseEntity : exercises) {
+            if ("Corrida na Esteira".equals(exerciseEntity.getName())) { // Ou o nome do exercício que você está testando
+                log.info("ENTIDADE 'Corrida na Esteira': ID={}, Nome={}, Tipo={}",
+                        exerciseEntity.getId(),
+                        exerciseEntity.getName(),
+                        exerciseEntity.getExerciseType()
+                );
+            }
+        }
+        // --- FIM DO LOG DE DEPURAÇÃO ---
+
+        List<ExerciseDto> exerciseDtos = exerciseMapper.toDto(exercises); // Mapeamento ocorre aqui
+
+        // --- INÍCIO DO LOG DE DEPURAÇÃO ---
+        log.info("Verificando valores do ExerciseDto APÓS o mapeamento:");
+        for (ExerciseDto exerciseDto : exerciseDtos) {
+            if ("Corrida na Esteira".equals(exerciseDto.getName())) { // Ou o nome do exercício que você está testando
+                log.info("DTO 'Corrida na Esteira': ID={}, Nome={}, Tipo={}",
+                        exerciseDto.getId(),
+                        exerciseDto.getName(),
+                        exerciseDto.getExerciseType()
+                );
+            }
+        }
+        // --- FIM DO LOG DE DEPURAÇÃO ---
+
+        return exerciseDtos;
     }
 
     // --- MÉTODO PARA DELETAR EXERCÍCIO (Para DELETE /api/exercises/{id}) ---
@@ -75,5 +104,4 @@ public class ExerciseService {
         exerciseRepository.deleteById(exerciseId);
         log.info("Exercício ID: {} excluído com sucesso.", exerciseId);
     }
-
 }

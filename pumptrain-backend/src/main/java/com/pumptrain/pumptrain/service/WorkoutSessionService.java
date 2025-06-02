@@ -132,10 +132,12 @@ public class WorkoutSessionService {
         if (session.getActivities() != null && !session.getActivities().isEmpty()) {
             for (ActivityLog activityEntity : session.getActivities()) {
                 // Log dos valores diretamente da entidade recuperada do banco
-                log.debug("  [ANTES] Activity ID {}: Reps='{}', Peso='{}'",
+                log.debug("  [ANTES] Activity ID {}: Reps='{}', Peso='{}', Intensidade='{}', Inclinação='{}' ",
                         activityEntity.getId(),
                         activityEntity.getRepetitions(),
-                        activityEntity.getWeightKg());
+                        activityEntity.getWeightKg(),
+                        activityEntity.getIntensity(),
+                        activityEntity.getIncline());
             }
         } else {
             log.debug("  [ANTES] Nenhuma atividade encontrada na entidade Session.");
@@ -151,10 +153,12 @@ public class WorkoutSessionService {
         if (dto.getActivities() != null && !dto.getActivities().isEmpty()) {
             for (ActivityLogDto activityDto : dto.getActivities()) {
                 // Log dos valores do DTO após o mapeamento ter sido feito
-                log.debug("  [APOS] Activity DTO ID {}: Reps='{}', Peso='{}'",
+                log.debug("  [APOS] Activity DTO ID {}: Reps='{}', Peso='{}', Intensidade='{}', Inclinação='{}' ",
                         activityDto.getId(),
                         activityDto.getRepetitions(),
-                        activityDto.getWeightKg());
+                        activityDto.getWeightKg(),
+                        activityDto.getIntensity(),
+                        activityDto.getIncline());
             }
         } else {
             log.debug("  [APOS] Nenhuma atividade encontrada no DTO.");
@@ -326,6 +330,8 @@ public class WorkoutSessionService {
         activityLog.setWeightKg(activityDto.getWeightKg());
         activityLog.setDurationMinutes(activityDto.getDurationMinutes());
         activityLog.setDistanceKm(activityDto.getDistanceKm());
+        activityLog.setIntensity(activityDto.getIntensity());
+        activityLog.setIncline(activityDto.getIncline());
         activityLog.setNotes(activityDto.getNotes());
         // Se o exerciseId mudar, precisa buscar o novo exercício e atualizar a referência
         if (activityDto.getExerciseId() != null && !activityDto.getExerciseId().equals(activityLog.getExercise().getId())) {

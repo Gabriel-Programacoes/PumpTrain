@@ -1,6 +1,8 @@
 package com.pumptrain.pumptrain.dto;
 
 import com.pumptrain.pumptrain.entity.enums.ExerciseType;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,6 +22,7 @@ public class ExerciseCreateDto {
     @Size(max = 1000, message = "A descrição não pode exceder 1000 caracteres.")
     private String description;
 
+    @NotBlank(message = "O grupo muscular não pode ser vazio.")
     @Size(max = 50, message = "O grupo muscular não pode exceder 50 caracteres.")
     private String muscleGroup;
 

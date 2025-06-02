@@ -2,13 +2,10 @@ package com.pumptrain.pumptrain.dto;
 
 import com.pumptrain.pumptrain.entity.enums.ExerciseType;
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -42,13 +39,24 @@ public class ActivityLogDto {
     @DecimalMin(value = "0.0", inclusive = false, message = "A distância em quilômetros (distanceKm) deve ser maior que zero.")
     private Double distanceKm;
 
+    @Column
+    @Min(value = 1, message = "Intensidade deve ser no mínimo 1")
+    @Max(value = 10, message = "A intensidade pode ser no máximo 10")
+    private Integer intensity;
+
+    @Column
+    @Min(value = 0, message = "A inclinação deve ser no mínimo 0")
+    @Max(value = 100, message = "A inclinação pode ser no máximo 100")
+    private Integer incline;
+
     @Size(max = 500, message = "As notas (notes) não podem exceder 500 caracteres.")
     private String notes;
+
 
     private LocalDateTime activityTimestamp;
 
     // Construtor adicional sem ID e timestamp (útil para criação)
-    public ActivityLogDto(Long exerciseId, String exerciseName, ExerciseType exerciseType, Integer sets, String repetitions, String weightKg, Integer durationMinutes, Double distanceKm, String notes) {
+    public ActivityLogDto(Long exerciseId, String exerciseName, ExerciseType exerciseType, Integer sets, String repetitions, String weightKg, Integer durationMinutes, Double distanceKm, Integer intensity, Integer incline, String notes) {
         this.exerciseId = exerciseId;
         this.exerciseName = exerciseName;
         this.exerciseType = exerciseType;
@@ -57,6 +65,8 @@ public class ActivityLogDto {
         this.weightKg = weightKg;
         this.durationMinutes = durationMinutes;
         this.distanceKm = distanceKm;
+        this.intensity = intensity;
+        this.incline = incline;
         this.notes = notes;
     }
 }

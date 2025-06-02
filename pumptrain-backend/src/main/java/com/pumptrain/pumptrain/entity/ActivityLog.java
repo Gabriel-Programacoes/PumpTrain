@@ -44,6 +44,12 @@ public class ActivityLog {
     @Column // Distância em KM
     private Double distanceKm;
 
+    @Column
+    private Integer intensity; // Intensidade específica desta atividade
+
+    @Column
+    private Integer incline;   // Inclinação específica desta atividade
+
     @Column(length = 500) // Notas específicas sobre esta atividade
     private String notes;
 
