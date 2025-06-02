@@ -60,14 +60,14 @@ const ProfilePage: React.FC = () => {
 
     // Função para salvar
     const handleSaveSubmit: SubmitHandler<ProfileFormData> = (formData) => {
-        console.log("Dados VALIDADOS do form (strings) para SALVAR:", formData);
+        // console.log("Dados VALIDADOS do form (strings) para SALVAR:", formData);
         const payload: Partial<Omit<User, 'id'>> = {
             name: formData.name, email: formData.email,
             age: parseNumericInput(formData.age),
             height: parseNumericInput(formData.height),
             weight: parseNumericInput(formData.weight, true),
         };
-        console.log("Payload formatado para mutação:", payload);
+        // console.log("Payload formatado para mutação:", payload);
         updateProfileMutation.mutate(payload, {
             onSuccess: (updatedUser) => {
                 console.log("Perfil atualizado com sucesso:", updatedUser);
@@ -96,8 +96,8 @@ const ProfilePage: React.FC = () => {
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Card variant="outlined" sx={{ mb: 3 }}>
                         <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", p: 3 }}>
-                            <Avatar sx={{ width: 120, height: 120, mb: 2, /*...*/ }} src={userProfile.avatarUrl ?? ''}>
-                                {!userProfile.avatarUrl ? userInitials : null}
+                            <Avatar sx={{ width: 120, height: 120, mb: 2, bgcolor: 'primary.main', fontSize: '3rem' }}>
+                                {userInitials}
                             </Avatar>
                             <Typography variant="h5" fontWeight="bold">{userProfile.name}</Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{userProfile.email}</Typography>

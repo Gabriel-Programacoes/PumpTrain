@@ -182,7 +182,7 @@ const CreateWorkoutPage: React.FC = () => {
                                     },
                                 }}
                             />
-                            <TextField label="Nome do Treino (Opcional)" fullWidth variant="outlined" size="small"
+                            <TextField label="Nome do Treino" required fullWidth variant="outlined" size="small"
                                        value={workoutName} onChange={(e) => setWorkoutName(e.target.value)}
                                        placeholder="Ex: Treino de Peito e Tríceps" sx={inputStyles}
                                        slotProps={{ input : {

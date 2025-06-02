@@ -3,11 +3,12 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useAuth } from '../../context/AuthContext';
 import apiClient from '../../api/apiClient';
 import { AxiosError } from 'axios';
+import { useSnackbar } from '../../context/SnackbarProvider';
 
 // MUI Imports
 import {
     Box, Container, Typography, TextField, Button, Grid, Link, Checkbox, FormControlLabel,
-    Paper, IconButton, InputAdornment, useMediaQuery, useTheme, Alert,
+    Paper, IconButton, InputAdornment, useMediaQuery, useTheme,
     CircularProgress, Stepper, Step, StepLabel, Stack, FormHelperText, FormControl, FormLabel
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -34,13 +35,22 @@ const RegisterContainer = styled(Box)(({ theme }) => ({
     },
 }));
 
-// --- Componente Principal Combinado ---
+interface RegisterApiErrorResponse {
+    timestamp?: string;
+    status?: number;
+    error?: string;
+    message?: string;
+    path?: string;
+    fieldErrors?: Array<{ field: string; message: string }>; // Importante para erros de validação do backend
+}
 
+// --- Componente Principal ---
 const RegisterPage: React.FC = () => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { login } = useAuth(); // Usar contexto para auto-login
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    const { showSnackbar } = useSnackbar();
 
     // Estados do formulário (adaptados para os campos necessários pelo backend)
     const [formData, setFormData] = useState({
@@ -64,7 +74,7 @@ const RegisterPage: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0); // Mantém o Stepper da v1
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword] = useState(false); // Para o campo de confirmação
-    const [submitError, setSubmitError] = useState<string | null>(null);
+    // const [submitError, setSubmitError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const steps = ["Informações da Conta", "Finalizar"]; // Simplificado para 2 passos
@@ -81,16 +91,17 @@ const RegisterPage: React.FC = () => {
             setErrors(prev => ({ ...prev, [name]: "" }));
         }
         // Limpa erro geral ao começar a digitar qualquer campo
-        if (submitError) setSubmitError(null);
+        // if (submitError) setSubmitError(null);
     };
 
     // Funções de Toggle de Senha
     const handleTogglePassword = () => setShowPassword(!showPassword);
-// Validação (simplificada para os campos necessários)
+// Validação
+
     const validateStep0 = (): boolean => {
         let isValid = true;
         const newErrors = { name: "", email: "", password: "", confirmPassword: "", agreeTerms: "" }; // Reinicia erros do passo
-        setSubmitError(null);
+        // setSubmitError(null);
 
         if (!formData.name.trim()) {
             newErrors.name = 'Nome é obrigatório.';
@@ -132,11 +143,11 @@ const RegisterPage: React.FC = () => {
             }
         } else if (activeStep === 1) {
             // No último passo, chama o submit final
-            handleSubmit();
+            handleSubmitForm();
         }
     };
 // Submit Final
-    const handleSubmit = async () => {
+    const handleSubmitForm = async () => {
         // Validação final
         if (!validateStep0()) {
             setActiveStep(0); // Volta para o passo com erros se chegou aqui de alguma forma
@@ -144,7 +155,7 @@ const RegisterPage: React.FC = () => {
         }
 
         setIsLoading(true);
-        setSubmitError(null);
+        // setSubmitError(null);
 
         // Payload SOMENTE com os dados esperados pelo backend
         const payload = {
@@ -152,15 +163,17 @@ const RegisterPage: React.FC = () => {
             email: formData.email,
             password: formData.password,
         };
-        console.log('[RegisterPage] Enviando payload para /auth/register:', payload);
+        // console.log('[RegisterPage] Enviando payload para /auth/register:', payload);
 
         try {
             // Tenta registrar
             await apiClient.post('/auth/register', payload);
-            console.log('[RegisterPage] Registro API OK.');
+            // console.log('[RegisterPage] Registro API OK.');
+            showSnackbar('Registro realizado com sucesso! Tentando login automático...', 'success');
+
 
             // Tenta fazer login automaticamente após registro
-            console.log('[RegisterPage] Tentando auto-login...');
+            // console.log('[RegisterPage] Tentando auto-login...');
             try {
                 const loginResponse = await apiClient.post<{ token: string }>('/auth/login', {
                     email: payload.email,
@@ -168,71 +181,63 @@ const RegisterPage: React.FC = () => {
                 });
                 const receivedToken = loginResponse.data.token;
                 if (receivedToken) {
-                    console.log('[RegisterPage] Auto-login OK. Token recebido.');
-                    login(receivedToken); // Salva token no contexto
+                    //console.log('[RegisterPage] Auto-login OK. Token recebido.');
+                    await login(receivedToken); // Salva token no contexto
+                    // showSnackbar('Login automático bem-sucedido!', 'success'); // Opcional
                     navigate('/dashboard'); // Redireciona para o dashboard
                 } else {
                     // Pouco provável, mas caso login não retorne token
-                    console.warn('[RegisterPage] Auto-login retornou sem token. Redirecionando para login manual.');
+                    // console.warn('[RegisterPage] Auto-login retornou sem token. Redirecionando para login manual.');
+                    showSnackbar('Registro bem-sucedido! Faça o login para continuar.', 'info');
                     navigate('/login');
                 }
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (loginError) {
                 // Se o auto-login falhar (não deveria, mas pode acontecer)
-                console.error("[RegisterPage] Falha no auto-login após registro:", loginError);
-                alert('Registro realizado com sucesso! Faça o login para continuar.'); // Informa sucesso no registro
+                // console.error("[RegisterPage] Falha no auto-login após registro:", loginError);
+                showSnackbar('Registro realizado com sucesso! Faça o login para continuar.', 'info');
                 navigate('/login'); // Envia para a página de login
             }
 
         } catch (error) {
-            console.error("[RegisterPage] Falha na chamada API de registro:", error);
+            // console.error("[RegisterPage] Falha na chamada API de registro:", error);
             setIsLoading(false); // Para o loading no erro
             setActiveStep(0); // Volta pro primeiro passo onde estão os campos com erro potencial
 
             let errorMessage = 'Falha no registro. Tente novamente.';
-            if (error instanceof AxiosError) {
-                console.error("API Error Response:", error.response?.data);
-                const responseData = error.response?.data;
-                if (error.response) {
-                    // Erro comum: email já existe (409 Conflict vindo do GlobalExceptionHandler)
-                    if (error.response.status === 409) {
-                        errorMessage = responseData?.message || responseData?.error || 'Este email já está cadastrado.';
-                    } else if (error.response.status === 400) { // Outros erros de validação do backend
-                        const fieldErrors = responseData?.fieldErrors;
-                        if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
-                            errorMessage = `Erro de validação: ${fieldErrors.join(', ')}`;
-                        } else {
-                            errorMessage = responseData?.message || responseData?.error || 'Erro nos dados fornecidos.';
-                        }
+            if (error instanceof AxiosError && error.response) {
+                const responseData = error.response.data as RegisterApiErrorResponse;
+                if (responseData?.message) {
+                    errorMessage = responseData.message;
+                } else if (responseData?.error) {
+                    errorMessage = responseData.error;
+                } else if (error.response.status === 409) { // Email já existe
+                    errorMessage = responseData?.message || 'Este email já está cadastrado.';
+                } else if (error.response.status === 400) { // Erros de validação
+                    if (responseData?.fieldErrors && responseData.fieldErrors.length > 0) {
+                        errorMessage = responseData.fieldErrors.map(fe => `${fe.field}: ${fe.message}`).join('; ');
+                    } else {
+                        errorMessage = responseData?.message || responseData?.error || 'Erro nos dados fornecidos.';
                     }
-                    else {
-                        errorMessage = `Erro do servidor (${error.response.status}). Tente mais tarde.`;
-                    }
-                } else if (error.request) {
-                    errorMessage = 'Sem resposta do servidor. Verifique sua conexão.';
-                } else {
-                    errorMessage = error.message || 'Erro ao preparar requisição de registro.';
+                } else if (error.response.status >= 500) {
+                    errorMessage = "Erro no servidor. Por favor, tente novamente mais tarde.";
                 }
+            } else if (error instanceof Error && error.message.includes("Network Error")) {
+                errorMessage = "Falha na conexão. Verifique sua internet.";
             } else if (error instanceof Error) {
                 errorMessage = error.message;
-            } else {
-                errorMessage = 'Ocorreu um erro inesperado durante o registro.';
             }
-            setSubmitError(errorMessage);
+            showSnackbar(errorMessage, 'error');
+            // setSubmitError(userFriendlyMessage); // Manter se quiser exibir no formulário também
         }
-        // Não colocar setIsLoading(false) aqui no fluxo de sucesso pois há navegação
     };
 
     // Renderiza o conteúdo do passo atual do Stepper
     const renderStepContent = (step: number) => {
         switch (step) {
-            case 0: // Informações da Conta (Campos necessários pelo backend)
+            case 0: // Informações da Conta
                 return (
                     <>
-                        {/* Exibe erro geral de submit/API no topo do formulário */}
-                        {submitError && (
-                            <Alert severity="error" sx={{ mb: 2 }}>{submitError}</Alert>
-                        )}
-
                         <FormControl fullWidth margin="normal">
                             <FormLabel htmlFor="name" sx={{ mb: 0.5 }}></FormLabel>
                             <TextField
@@ -317,10 +322,6 @@ const RegisterPage: React.FC = () => {
                         <Typography variant="body1" color="text.secondary">
                             Revise suas informações no passo anterior, se necessário. Clique abaixo para finalizar seu cadastro.
                         </Typography>
-                        {/* Exibe erro geral de submit/API também neste passo */}
-                        {submitError && (
-                            <Alert severity="error" sx={{ mt: 2, mb: 1, textAlign: 'left' }}>{submitError}</Alert>
-                        )}
                     </Box>
                 );
             default:

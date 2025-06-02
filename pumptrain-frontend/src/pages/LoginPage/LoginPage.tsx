@@ -7,7 +7,7 @@ import { AxiosError } from 'axios';
 // MUI Imports
 import {
     Box, Container, Typography, TextField, Button, Grid, Link,
-    Divider, Paper, IconButton, InputAdornment, useMediaQuery, useTheme, Alert,
+    Divider, Paper, IconButton, InputAdornment, useMediaQuery, useTheme,
     CircularProgress, FormLabel, FormControl,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -18,6 +18,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {useSnackbar} from "../../context/SnackbarProvider.tsx";
 
 // --- Componentes Estilizados  ---
 const LoginContainer = styled(Box)(({ theme }) => ({
@@ -62,6 +63,7 @@ const LoginPage: React.FC = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const navigate = useNavigate();
     const { login } = useAuth();
+    const { showSnackbar } = useSnackbar();
 
     // Estados
     const [showPassword, setShowPassword] = useState(false);
@@ -69,7 +71,7 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
-    const [submitError, setSubmitError] = useState<string | null>(null);
+    // const [submitError, setSubmitError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     // Funções
@@ -81,7 +83,7 @@ const LoginPage: React.FC = () => {
         let isValid = true;
         setEmailError('');
         setPasswordError('');
-        setSubmitError(null);
+        // setSubmitError(null);
 
         if (!email || !/\S+@\S+\.\S+/.test(email)) {
             setEmailError('Por favor, insira um email válido.');
@@ -104,10 +106,10 @@ const LoginPage: React.FC = () => {
             return;
         }
         setIsLoading(true);
-        setSubmitError(null);
+        // setSubmitError(null);
 
         try {
-            console.log(`[LoginPage] Enviando credenciais para /auth/login`);
+            // console.log(`[LoginPage] Enviando credenciais para /auth/login`);
             const response = await apiClient.post<{ token: string }>('/auth/login', {
                 email: email,
                 password: password,
@@ -115,18 +117,18 @@ const LoginPage: React.FC = () => {
             const receivedToken = response.data.token;
 
             if (receivedToken) {
-                console.log(`[LoginPage] Login API OK. Token recebido.`);
+                // console.log(`[LoginPage] Login API OK. Token recebido.`);
+                await login(receivedToken);
 
+                showSnackbar('Login bem-sucedido! Redirecionando...', 'success');
 
-                login(receivedToken);
-
-                console.log(`[LoginPage] Redirecionando para /dashboard...`);
+                // console.log(`[LoginPage] Redirecionando para /dashboard...`);
                 navigate('/dashboard'); // Navega após sucesso
             } else {
                 throw new Error('Resposta da API não continha um token.');
             }
         } catch (error) {
-            console.error("[LoginPage] Falha na chamada API de login:", error);
+            // console.error("[LoginPage] Falha na chamada API de login:", error);
             setIsLoading(false);
             let errorMessage = 'Falha no login. Verifique sua conexão e tente novamente.';
 
@@ -155,7 +157,9 @@ const LoginPage: React.FC = () => {
             } else {
                 errorMessage = 'Ocorreu um erro inesperado durante o login.';
             }
-            setSubmitError(errorMessage);
+            showSnackbar(errorMessage, 'error')
+
+            // setSubmitError(errorMessage);
         }
     };
 
@@ -237,11 +241,9 @@ const LoginPage: React.FC = () => {
 
                             {/* FORMULÁRIO com lógica da segunda versão */}
                             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-
-                                {submitError && (
+                                {/* {submitError && ( // Removido Alert para usar Snackbar
                                     <Alert severity="error" sx={{ mb: 2 }}>{submitError}</Alert>
-                                )}
-
+                                )} */}
                                 <FormControl fullWidth sx={{ mb: 1 }}>
                                     <FormLabel htmlFor="email" sx={{ mb: 0.5 }}></FormLabel>
                                     <TextField
@@ -268,8 +270,7 @@ const LoginPage: React.FC = () => {
                                         error={!!passwordError}
                                         helperText={passwordError}
                                         disabled={isLoading}
-                                        slotProps={{
-                                            input: {
+                                        slotProps={{ input: {
                                                 endAdornment: (
                                                     <InputAdornment position="end">
                                                         <IconButton
@@ -278,11 +279,13 @@ const LoginPage: React.FC = () => {
                                                             edge="end"
                                                             size="small"
                                                         >
-                                                            {showPassword ? <VisibilityOffIcon fontSize="small"/> : <VisibilityIcon fontSize="small"/>}
+                                                            {showPassword ? <VisibilityOffIcon fontSize="small"/> :
+                                                                <VisibilityIcon fontSize="small"/>}
                                                         </IconButton>
                                                     </InputAdornment>
                                                 )
-                                        }}}
+                                            }
+                                        }}
                                     />
                                 </FormControl>
 

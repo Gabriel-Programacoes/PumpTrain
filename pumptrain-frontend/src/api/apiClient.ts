@@ -39,28 +39,27 @@ apiClient.interceptors.request.use(
 // --------- Interceptor de resposta ---------
 // É executado após cada requisição
 apiClient.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error: AxiosError<ApiErrorResponse>): Promise<AxiosError> => {
+    (response) => response,
+    (error: AxiosError<ApiErrorResponse>) => {
         const originalRequest = error.config;
 
         if (error.response) {
-            console.error(`[API CLIENT] Erro ${error.response.status} na resposta para ${originalRequest?.url}: `, error.response.data);
-        } else if (error.request) {
-            console.error(`[API CLIENT] Erro sem resposta para ${originalRequest?.url}: `, error.request);
-        } else {
-            console.error(`[API CLIENT] Erro ao fazer requisição para ${originalRequest?.url}: `, error.message);
-        }
+            // console.error(`[API CLIENT] Erro ${error.response.status} na resposta para ${originalRequest?.url}: `, error.response.data);
 
-        // Tratamento para erro 401
-        // Ignora o tratamento se a requisição original já foi uma tentativa de login
-        if (error.response && error.response.status === 401 && originalRequest?.url !== "/auth/login") {
-            console.warn("[API CLIENT] Erro 401 detectado! Token pode ser inválido ou estar expirado!");
-            localStorage.removeItem("authToken")
-            console.log("[API CLIENT] Token removido do local Storage devido a erro 401.");
+            // TRATAMENTO PARA ERRO 401
+            if (error.response.status === 401 && originalRequest?.url !== "/auth/login") {
+                console.warn("[API CLIENT] Erro 401 detectado! Token pode ser inválido ou estar expirado!");
+                localStorage.removeItem("authToken");
+
+                window.location.href = '/login'; // Força o redirecionamento e recarregamento
             }
 
+        } else if (error.request) {
+            // console.error(`[API CLIENT] Erro sem resposta para ${originalRequest?.url}: `, error.request);
+            // Poderia disparar um snackbar de "Erro de Rede" aqui, mas também é complexo sem o hook.
+        } else {
+            // console.error(`[API CLIENT] Erro ao fazer requisição para ${originalRequest?.url}: `, error.message);
+        }
         return Promise.reject(error);
     }
 );

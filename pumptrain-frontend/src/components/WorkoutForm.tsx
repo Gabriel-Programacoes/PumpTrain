@@ -294,7 +294,7 @@ export const WorkoutForm: React.FC<WorkoutFormProps> = ({
                 render={({ field }) => (
                     <TextField
                         {...field}
-                        label="Nome do Treino (Opcional)"
+                        label="Nome do Treino"
                         margin="normal"
                         fullWidth
                         error={!!errors.name}

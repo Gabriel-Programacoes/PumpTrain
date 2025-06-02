@@ -187,7 +187,7 @@ const EditWorkoutPage: React.FC = () => {
         );
     }
 
-    // Renderização se !currentWorkout (mantida)
+    // Renderização se !currentWorkout
     if (!currentWorkout) {
         return (
             <Fade in={true} timeout={500}>
