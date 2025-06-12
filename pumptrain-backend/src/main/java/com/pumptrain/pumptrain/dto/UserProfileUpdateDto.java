@@ -15,17 +15,16 @@ public class UserProfileUpdateDto {
 
     @Min(value = 1, message="A idade deve ser um valor positivo.")
     @Max(value = 80, message="Idade inválida.")
-    @Column
     private Integer age;
 
     @Min(value = 1, message="Altura deve ser um valor positivo (em cm).")
     @Max(value = 300, message="Altura inválida (em cm).")
-    @Column
     private Integer height;
-
 
     @DecimalMin(value = "0.1", message="Peso deve ser um valor positivo (em kg).")
     @DecimalMax(value ="1000.0", message="Peso inválido (em kg).")
-    @Column
     private Double weight;
+
+    @Size(max = 100, message = "A chave do avatar não pode exceder 100 caracteres.")
+    private String avatarKey;
 }

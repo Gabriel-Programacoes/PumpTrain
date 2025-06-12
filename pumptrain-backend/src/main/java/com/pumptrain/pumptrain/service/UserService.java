@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime; // <<< Adicionar para .atTime(LocalTime.MAX)
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Comparator;
 import java.util.List;
@@ -88,6 +88,9 @@ public class UserService {
             log.debug("Campo 'weight' atualizado para o usuário {}", userEmail);
         }
 
+        user.setAvatarKey(updateDto.getAvatarKey());
+        log.debug("Campo 'avatarKey' atualizado para '{}' para o usuário {}", updateDto.getAvatarKey(), userEmail);
+
         User savedUser = userRepository.save(user);
         log.info("Perfil atualizado e salvo para usuário: {}", userEmail);
         return userMapper.toUserProfileDto(savedUser);
@@ -107,10 +110,8 @@ public class UserService {
         LocalDateTime startOfMonthDateTime = currentYMonth.atDay(1).atStartOfDay();
         LocalDateTime endOfMonthDateTime = currentYMonth.atEndOfMonth().atTime(LocalTime.MAX); // Usa LocalTime.MAX para o fim do dia
 
-        // VVVVV CORREÇÃO DA CHAMADA E NOME DA VARIÁVEL VVVVV
         int workoutsCompletedThisMonth = workoutSessionRepository.countByUserAndCompletedAtBetween(user, startOfMonthDateTime, endOfMonthDateTime);
         log.debug("Treinos CONCLUÍDOS no mês {} para {}: {}", currentYMonth, userEmail, workoutsCompletedThisMonth);
-        // ^^^^^ CORREÇÃO DA CHAMADA E NOME DA VARIÁVEL ^^^^^
 
         // Calcula Streaks baseado em treinos CONCLUÍDOS
         StreakInfo streakInfo = calculateStreaksBasedOnCompletion(user);
@@ -118,8 +119,8 @@ public class UserService {
 
         // Constrói o DTO
         UserStatsDto statsDto = UserStatsDto.builder()
-                .workoutsTotal(totalWorkoutsRegistered) // Mantém o total de treinos registrados
-                .workoutsThisMonth(workoutsCompletedThisMonth) // Agora reflete os treinos CONCLUÍDOS no mês
+                .workoutsTotal(totalWorkoutsRegistered)
+                .workoutsThisMonth(workoutsCompletedThisMonth)
                 .currentStreak(streakInfo.currentStreak())
                 .recordStreak(streakInfo.recordStreak())
                 .build();

@@ -14,4 +14,5 @@ public class UserProfileDto {
     private Integer age;
     private Integer height;
     private Double weight;
+    private String avatarKey;
 }

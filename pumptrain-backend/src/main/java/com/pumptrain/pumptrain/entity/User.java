@@ -38,6 +38,9 @@ public class User implements UserDetails {
     @Column
     private Integer age;
 
+    @Column(length = 100) // Novo campo para a chave do avatar
+    private String avatarKey;
+
     @Column
     private Integer height;
     @Column
@@ -45,7 +48,7 @@ public class User implements UserDetails {
 
     // --- Implementação dos Métodos da Interface UserDetails ---
     @Override
-    @Transient // Diz ao JPA para IGNORAR este método (não é uma coluna no banco)
+    @Transient
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
