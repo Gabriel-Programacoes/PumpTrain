@@ -26,7 +26,7 @@ export const useCompleteWorkoutMutation = () => {
             // Invalidar queries para forçar recarregamento dos dados atualizados
             queryClient.invalidateQueries({ queryKey: ['workouts'] }); // Lista geral de treinos
             queryClient.invalidateQueries({ queryKey: ['workout', workoutId] }); // Detalhes deste treino
-            queryClient.invalidateQueries({ queryKey: ['userStats'] }); // <<< MUITO IMPORTANTE: Para atualizar a sequência
+            queryClient.invalidateQueries({ queryKey: ['userStats'] });
             queryClient.invalidateQueries({ queryKey: ['workout', 'today'] });
 
             console.debug(`[useCompleteWorkoutMutation] Treino ID ${workoutId} concluído. Queries invalidadas.`);

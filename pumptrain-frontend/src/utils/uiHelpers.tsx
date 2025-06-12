@@ -24,7 +24,7 @@ import {alpha, styled} from "@mui/material/styles";
  * @returns As duas primeiras iniciais em maiúsculas.
  */
 export const getInitials = (name: string = ""): string => {
-    if (!name || typeof name !== 'string') return "";
+    if (!name) return "";
     return name
         .split(' ')
         .map(word => word[0])

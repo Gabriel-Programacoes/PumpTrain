@@ -4,21 +4,13 @@ import {
     ListItemText, Divider, Typography, Button
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
-import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import { useAuth } from "../context/AuthContext";
+import { getInitials } from '../utils/uiHelpers';
+import { getAvatarPath } from '../utils/avatarUtils';
 
-// Função auxiliar para gerar iniciais
-const getInitials = (name: string = ""): string => {
-    return name
-        .split(' ')
-        .map(word => word[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
-};
 
 const UserMenu: React.FC = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -37,7 +29,6 @@ const UserMenu: React.FC = () => {
     };
 
     const handleProfile = () => { navigate('/profile'); handleClose(); };
-    const handleSettings = () => { navigate('/settings'); handleClose(); };
 
     // <<< Chama isAuthenticated() como função e verifica se user existe >>>
     if (!isAuthenticated() || !user) {
@@ -50,22 +41,58 @@ const UserMenu: React.FC = () => {
         );
     }
 
-    // Se chegou aqui, está autenticado e temos 'user'
-    const userInitials = getInitials(user.name); // Usa user.name
+    const userInitials = getInitials(user.name);
+    const avatarPath = getAvatarPath(user.avatarKey);
+
 
     return (
         <Box>
-            <IconButton onClick={handleClick} size="small" sx={{ /* ... */ }} aria-label="Menu do usuário" >
-                {/* Usa user.avatarUrl ou userInitials */}
+            <IconButton onClick={handleClick} size="small" aria-label="Menu do usuário">
                 <Avatar
-                    sx={{ width: 32, height: 32, /* ... */ }}
-                    src={user.avatarUrl || undefined} // <<< Usa user.avatarUrl se existir
+                    sx={{
+                        width: 32,
+                        height: 32,
+                        bgcolor: !avatarPath ? 'primary.dark' : undefined // Cor de fundo para iniciais
+                    }}
+                    src={avatarPath} // Usa o caminho do avatar se existir
                 >
-                    {!user.avatarUrl ? userInitials : null}
+                    {/* Exibe iniciais somente se não houver avatarPath */}
+                    {!avatarPath ? userInitials : null}
                 </Avatar>
             </IconButton>
-            <Menu anchorEl={anchorEl} open={open} onClose={handleClose} /* ... */>
-                {/* Mostra user.name e user.email */}
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                    elevation: 0,
+                    sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                        mt: 1.5,
+                        '& .MuiAvatar-root': {
+                            width: 32,
+                            height: 32,
+                            ml: -0.5,
+                            mr: 1,
+                        },
+                        '&::before': { // Para a setinha do menu
+                            content: '""',
+                            display: 'block',
+                            position: 'absolute',
+                            top: 0,
+                            right: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: 'background.paper',
+                            transform: 'translateY(-50%) rotate(45deg)',
+                            zIndex: 0,
+                        },
+                    },
+                }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
                 <Box sx={{ px: 2, py: 1.5 }}>
                     <Typography variant="subtitle1" fontWeight="medium">{user.name}</Typography>
                     <Typography variant="body2" color="text.secondary">{user.email}</Typography>
@@ -75,11 +102,6 @@ const UserMenu: React.FC = () => {
                     <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
                     <ListItemText>Perfil</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={handleSettings}>
-                    <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
-                    <ListItemText>Configurações</ListItemText>
-                </MenuItem>
-                <Divider />
                 <MenuItem onClick={handleLogout}>
                     <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
                     <ListItemText>Sair</ListItemText>

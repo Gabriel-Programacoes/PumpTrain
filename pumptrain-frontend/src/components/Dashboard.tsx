@@ -137,7 +137,7 @@ const Dashboard: React.FC = () => {
                                 <Stack direction="row" spacing={1} sx={{ mt: 1, minHeight: 32 }}>
                                     {isLoadingAchievements ? <> <Skeleton variant="circular" width={32} height={32} /> <Skeleton variant="circular" width={32} height={32} /> </> :
                                         achievementsData?.recent?.slice(0, 3).map((ach) => (
-                                            <Avatar key={ach.id} title={ach.name} sx={{ width: 32, height: 32, bgcolor: "primary.light" }}>
+                                            <Avatar key={ach.id} title={ach.name} sx={{ width: 64, height: 64, bgcolor: "primary.light" }}>
                                                 {mapIconNameToComponent(ach.iconName)}
                                             </Avatar>
                                         ))
